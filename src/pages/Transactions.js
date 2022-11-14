@@ -1,53 +1,115 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCog, faHome, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, InputGroup, Dropdown } from '@themesberg/react-bootstrap';
+import { Col, Row, Form, ButtonGroup, Breadcrumb, InputGroup, Dropdown } from '@themesberg/react-bootstrap';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 
 import App from './App'
 
+
+const URL_PRODUCTS = 'http://localhost:8080/sp-api/process-product';
+
 export default () => {
+  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [productNotFound, setProductNotFound] = useState(false);
+  const [productLoaded, setProductLoaded] = useState(false);
+
+  const handleChange = (event) => {
+    let fieldName = event.target.name;
+    let fleldVal = event.target.value;
+    console.log(fleldVal);
+    setInputValue(fleldVal);
+  }
+
+  const handleLoadProduct = () => {
+    let queryString = `${URL_PRODUCTS}?asin==${inputValue}`;
+    setLoading(true);
+    fetch(queryString, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {},
+    })
+      .then(response => response.json())
+      .then(({ content, totalElements }) => {
+        console.log('Product found ' + content);
+        setProductLoaded(true);
+        setLoading(false);
+        setTimeout(() => {
+          setProductLoaded(false);
+        }, 5000);
+      })
+      .catch(() => {
+        console.log('Data not found');
+        setProductNotFound(true);
+        setLoading(false);
+
+        setTimeout(() => {
+          setProductNotFound(false);
+        }, 5000);
+      });
+  }
+
+  useEffect(() => {
+
+  });
+
   return (
-    <>
+    <Paper style={{ position: 'relative', margin: '10' }}>
+
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-        <div className="d-block mb-4 mb-md-0">
+        <div className="d-block mb-4 mb-md-0" >
           <h4>Products</h4>
         </div>
         <div className="btn-toolbar mb-2 mb-md-0">
-      
+
         </div>
       </div>
 
-      <div className="table-settings mb-4">
+      <div className="table-settings mb-4" >
+
         <Row className="justify-content-between align-items-center">
-          <Col xs={8} md={6} lg={3} xl={4}>
-            <InputGroup>
+          <Stack direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
+
+            <Paper><InputGroup>
               <InputGroup.Text>
                 <FontAwesomeIcon icon={faSearch} />
               </InputGroup.Text>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control onChange={handleChange} type="text" placeholder="ASIN" aria-describedby="inputGroup-sizing-sm" />
             </InputGroup>
-          </Col>
-          <Col xs={4} md={2} xl={1} className="ps-md-0 text-end">
-            <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle split as={Button} variant="link" className="text-dark m-0 p-0">
-                <span className="icon icon-sm icon-gray">
-                  <FontAwesomeIcon icon={faCog} />
-                </span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="dropdown-menu-xs dropdown-menu-right">
-                <Dropdown.Item className="fw-bold text-dark">Show</Dropdown.Item>
-                <Dropdown.Item className="d-flex fw-bold">
-                  10 <span className="icon icon-small ms-auto"><FontAwesomeIcon icon={faCheck} /></span>
-                </Dropdown.Item>
-                <Dropdown.Item className="fw-bold">20</Dropdown.Item>
-                <Dropdown.Item className="fw-bold">30</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Col>
+            </Paper>
+
+            <Button variant="contained" endIcon={<SendIcon />} onClick={handleLoadProduct}>
+              Load product
+            </Button>
+          </Stack>
+
         </Row>
+
       </div>
 
+      {loading && <Stack alignItems="center">
+        <CircularProgress />
+      </Stack>}
+      <Stack sx={{ width: '100%' }} spacing={2}>
+        {productNotFound && <Alert onClose={() => { setProductNotFound(false); }} severity="warning">The product with the asin [ {inputValue} ] was not found</Alert>}
+        {productLoaded && <Alert onClose={() => {
+          setProductLoaded(false);
+        }} severity="success">The product was loaded sucessfully</Alert>}
+      </Stack>
       <App />
-    </>
+    </Paper>
   );
 };

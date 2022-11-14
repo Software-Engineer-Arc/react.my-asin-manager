@@ -99,7 +99,7 @@ export default (props = {}) => {
              
               <Dropdown.Divider className="my-3 border-indigo" />
             </Nav>
-          </div>
+          </div>                                
         </SimpleBar>
       </CSSTransition>
     </>

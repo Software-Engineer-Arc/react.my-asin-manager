@@ -1,0 +1,1 @@
+{"version":3,"file":"text-cell.d.ts","sourceRoot":"","sources":["../../../../src/data-grid/cells/text-cell.tsx"],"names":[],"mappings":"AAIA,OAAO,EAAgB,QAAQ,EAAE,MAAM,oBAAoB,CAAC;AAC5D,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,cAAc,CAAC;AAEzD,eAAO,MAAM,gBAAgB,EAAE,oBAAoB,CAAC,QAAQ,CAoC3D,CAAC"}

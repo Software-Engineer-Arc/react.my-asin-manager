@@ -1,0 +1,1 @@
+{"version":3,"file":"protected-cell.d.ts","sourceRoot":"","sources":["../../../../src/data-grid/cells/protected-cell.tsx"],"names":[],"mappings":"AACA,OAAO,EAAgB,aAAa,EAAE,MAAM,oBAAoB,CAAC;AACjE,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,cAAc,CAAC;AAEzD,eAAO,MAAM,qBAAqB,EAAE,oBAAoB,CAAC,aAAa,CAQrE,CAAC"}
