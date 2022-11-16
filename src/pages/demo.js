@@ -11,13 +11,13 @@ import Avatar from '@material-ui/core/Avatar';
 import Link from '@mui/material/Link';
 
 import {
-  SortingState, SelectionState, FilteringState, PagingState, GroupingState, RowDetailState,
-  IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider
+    SortingState, SelectionState, FilteringState, PagingState, GroupingState, RowDetailState,
+    IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider
 } from '@devexpress/dx-react-grid';
 import {
-  Grid, Table, TableBandHeader, TableHeaderRow,
-  TableFilterRow, TableSelection, TableGroupRow, TableRowDetail,
-  GroupingPanel, PagingPanel, DragDropProvider, TableColumnReordering, TableColumnResizing, Toolbar,
+    Grid, Table, TableBandHeader, TableHeaderRow,
+    TableFilterRow, TableSelection, TableGroupRow, TableRowDetail,
+    GroupingPanel, PagingPanel, DragDropProvider, TableColumnReordering, TableColumnResizing, Toolbar,
 } from '@devexpress/dx-react-grid-material-ui';
 import { styled } from '@mui/material/styles';
 
@@ -26,9 +26,9 @@ import { Loading } from './tables/theme-sources/material-ui/components/loading';
 import { CurrencyTypeProvider } from './tables/theme-sources/material-ui/components/currency-type-provider';
 
 import {
-  generateRows,
-  employeeValues,
-  employeeTaskValues,
+    generateRows,
+    employeeValues,
+    employeeTaskValues,
 } from './generator';
 
 
@@ -36,271 +36,300 @@ const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/order
 
 const URL_PRODUCTS = 'http://localhost:8080/products';
 
+const URL_PRODUCTS_UPDATED = 'http://localhost:8080/sse/product-prices';
+
 
 const CurrencyFormatter = ({ value }) => (
-  <b style={{ color: 'darkgreen' }}>
-    {value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
-  </b>
+    <b style={{ color: 'darkgreen' }}>
+        {value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+    </b>
 );
 
 const ImageFormatter = ({ value }) => (
-  <Paper elevation={0}>
-    <img src={value} />
-    {/* <Image src={value} /> */}
-  </Paper>);
+    <Paper elevation={0}>
+        <img src={value} />
+        {/* <Image src={value} /> */}
+    </Paper>);
 
 const LinkFormatter = ({ value }) => (
-  <Link href={value}>Click here</Link>
+    <Link href={value}>Click here</Link>
 );
 
 
 const PREFIX = 'Demo';
 
 const classes = {
-  detailContainer: `${PREFIX}-detailContainer`,
-  title: `${PREFIX}-title`,
+    detailContainer: `${PREFIX}-detailContainer`,
+    title: `${PREFIX}-title`,
 };
 const StyledDiv = styled('div')(({ theme }) => ({
-  [`&.${classes.detailContainer}`]: {
-    margin: '20px',
-  },
-  [`& .${classes.title}`]: {
-    color: theme.palette.text.primary,
-    fontSize: theme.typography.fontSize,
-  },
+    [`&.${classes.detailContainer}`]: {
+        margin: '20px',
+    },
+    [`& .${classes.title}`]: {
+        color: theme.palette.text.primary,
+        fontSize: theme.typography.fontSize,
+    },
 }));
 
 const useStyles = makeStyles({
-  root: {
-    minWidth: 275,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
+    root: {
+        minWidth: 275,
+    },
+    bullet: {
+        display: 'inline-block',
+        margin: '0 2px',
+        transform: 'scale(0.8)',
+    },
+    title: {
+        fontSize: 14,
+    },
+    pos: {
+        marginBottom: 12,
+    },
 });
 
 const detailColumns = [
-  { name: 'notes', title: 'Notes' },
-  { name: 'date', title: 'Date' },
-  { name: 'tags', title: 'Tags' },
-  // { name: 'alternateSupplier', title: 'Alternate Supplier' },
+    { name: 'notes', title: 'Notes' },
+    { name: 'date', title: 'Date' },
+    { name: 'tags', title: 'Tags' },
+    // { name: 'alternateSupplier', title: 'Alternate Supplier' },
 ];
 const tableDetailColumnExtensions = [
-  { columnName: 'notes', width: 165 },
-  { columnName: 'date', width: 115 },
-  { columnName: 'tags', width: 115 },
+    { columnName: 'notes', width: 165 },
+    { columnName: 'date', width: 115 },
+    { columnName: 'tags', width: 115 },
 ];
 
 
 const RowDetail = ({ row }) => (<StyledDiv className={classes.detailContainer}>
-  <div>
-    <h5 className={classes.title}>
-      Details:
-    </h5>
-  </div>
-  <Paper>
-    <Card className={useStyles.root}>
-      <CardContent>
-        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-          Tags
-        </Typography>
-        <Chip label={row.details.tags} />
-        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-          Date
-        </Typography>
-        <Typography variant="body2" component="p">
-          {row.details.date}
-        </Typography>
-        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-          Notes
-        </Typography>
-        <Typography variant="body2" component="p">
-          {row.details.notes}
-        </Typography>
-      </CardContent>
+    <div>
+        <h5 className={classes.title}>
+            Details:
+        </h5>
+    </div>
+    <Paper>
+        <Card className={useStyles.root}>
+            <CardContent>
+                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                    Tags
+                </Typography>
+                <Chip label={row.details.tags} />
+                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                    Date
+                </Typography>
+                <Typography variant="body2" component="p">
+                    {row.details.date}
+                </Typography>
+                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                    Notes
+                </Typography>
+                <Typography variant="body2" component="p">
+                    {row.details.notes}
+                </Typography>
+            </CardContent>
 
-    </Card>
-  </Paper>
+        </Card>
+    </Paper>
 </StyledDiv>
 );
 
 const ImageTypeProvider = props => (
-  <DataTypeProvider
-    formatterComponent={ImageFormatter}
-    {...props}
-  />
+    <DataTypeProvider
+        formatterComponent={ImageFormatter}
+        {...props}
+    />
 );
 
 const LinkTypeProvider = props => (
-  <DataTypeProvider
-    formatterComponent={LinkFormatter}
-    {...props}
-  />
+    <DataTypeProvider
+        formatterComponent={LinkFormatter}
+        {...props}
+    />
 );
 export default () => {
 
-  const [columns] = useState([
-    { name: 'image', title: 'Image' },
-    { name: 'title', title: 'Title' },
-    { name: 'asin', title: 'ASIN' },
-    { name: 'supplierLink', title: 'Supplier Link' },
-    { name: 'currentBBPrice', title: 'BB Price' },
-    { name: 'buyCost', title: 'Buy Cost' },
-    { name: 'netMargin', title: 'Net Margin' },
-    { name: 'currentBSR', title: 'BSR' },
-    { name: 'fbaSellerCount', title: 'FBA Seller count' },
+    const [columns] = useState([
+        { name: 'image', title: 'Image' },
+        { name: 'title', title: 'Title' },
+        { name: 'asin', title: 'ASIN' },
+        { name: 'supplierLink', title: 'Supplier Link' },
+        { name: 'currentBBPrice', title: 'BB Price' },
+        { name: 'buyCost', title: 'Buy Cost' },
+        { name: 'netMargin', title: 'Net Margin' },
+        { name: 'currentBSR', title: 'BSR' },
+        { name: 'fbaSellerCount', title: 'FBA Seller count' },
 
-  ]);
-  const [rows, setRows] = useState([]);
-  const [currencyColumns] = useState(['currentBBPrice', 'buyCost', 'netMargin', 'currentBSR']);
-  const [imageColumns] = useState(['image']);
-  const [linkColumns] = useState(['supplierLink']);
+    ]);
+    const [rows, setRows] = useState([]);
+    const [currencyColumns] = useState(['currentBBPrice', 'buyCost', 'netMargin', 'currentBSR']);
+    const [imageColumns] = useState(['image']);
+    const [linkColumns] = useState(['supplierLink']);
 
-  const [tableColumnExtensions] = useState([
-    { columnName: 'title', align: 'left' },
-    { columnName: 'asin', align: 'left' },
-  ]);
-  const [sorting, setSorting] = useState([{ columnName: 'title', direction: 'asc' }]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [pageSizes] = useState([5, 10, 15]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [lastQuery, setLastQuery] = useState();
-  const [columnWidths, setColumnWidths] = useState([
-    { columnName: 'image', width: 150 },
-    { columnName: 'title', width: 350 },
-    { columnName: 'asin', width: 130 },
-    { columnName: 'supplierLink', width: 130 },
-    { columnName: 'currentBBPrice', width: 130 },
-    { columnName: 'buyCost', width: 100 },
-    { columnName: 'netMargin', width: 130 },
-    { columnName: 'currentBSR', width: 130 },
-    { columnName: 'fbaSellerCount', width: 150 },
-  ]);
-  const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']);
+    const [tableColumnExtensions] = useState([
+        { columnName: 'title', align: 'left' },
+        { columnName: 'asin', align: 'left' },
+    ]);
+    const [sorting, setSorting] = useState([{ columnName: 'title', direction: 'asc' }]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [pageSizes] = useState([5, 10, 15]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [lastQuery, setLastQuery] = useState();
+    const [columnWidths, setColumnWidths] = useState([
+        { columnName: 'image', width: 150 },
+        { columnName: 'title', width: 350 },
+        { columnName: 'asin', width: 130 },
+        { columnName: 'supplierLink', width: 130 },
+        { columnName: 'currentBBPrice', width: 130 },
+        { columnName: 'buyCost', width: 100 },
+        { columnName: 'netMargin', width: 130 },
+        { columnName: 'currentBSR', width: 130 },
+        { columnName: 'fbaSellerCount', width: 150 },
+    ]);
+    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']);
 
-  const [filteringStateColumnExtensions] = useState([
-    { columnName: 'image', filteringEnabled: false },
-  ]);
+    const [filteringStateColumnExtensions] = useState([
+        { columnName: 'image', filteringEnabled: false },
+    ]);
 
-  const changePageSize = (value) => {
-    const totalPages = Math.ceil(totalCount / value);
-    const updatedCurrentPage = Math.min(currentPage, totalPages - 1);
+    const changePageSize = (value) => {
+        const totalPages = Math.ceil(totalCount / value);
+        const updatedCurrentPage = Math.min(currentPage, totalPages - 1);
 
-    setPageSize(value);
-    setCurrentPage(updatedCurrentPage);
-  };
+        setPageSize(value);
+        setCurrentPage(updatedCurrentPage);
+    };
 
-  const getQueryString = () => {
-    let queryString = `${URL_PRODUCTS}?size=${pageSize}&page=${currentPage}`;
+    const getQueryString = () => {
+        let queryString = `${URL_PRODUCTS}?size=${pageSize}&page=${currentPage}`;
 
-    if (sorting.length) {
-      queryString = `${queryString}&sort=${sorting[0].columnName},${sorting[0].direction}`;
-    }
-    return queryString;
-  };
-
-
-
-  const loadData = () => {
-    const queryString = getQueryString();
-    if (queryString !== lastQuery && !loading) {
-      setLoading(true);
-      fetch(queryString)
-        .then(response => response.json())
-        .then(({ content, totalElements }) => {
-          console.log('Data from service products ' + content);
-          setRows(content);
-          setTotalCount(totalElements);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-      setLastQuery(queryString);
-    }
-  };
-
-  useEffect(() => loadData());
-
-  return (
-    <Paper style={{ position: 'relative' }}>
-      <Grid
-        rows={rows}
-        columns={columns}
-      >
-        <FilteringState defaultFilters={['title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
-          columnExtensions={filteringStateColumnExtensions}
-        />
-        <IntegratedFiltering />
-
-        <DragDropProvider />
-
-        <CurrencyTypeProvider
-          for={currencyColumns}
-          formatterComponent={CurrencyFormatter}
-        />
-        <ImageTypeProvider
-          for={imageColumns}
-        />
-
-        <LinkTypeProvider
-          for={linkColumns}
-          formatterComponent={LinkFormatter}
-        />
+        if (sorting.length) {
+            queryString = `${queryString}&sort=${sorting[0].columnName},${sorting[0].direction}`;
+        }
+        return queryString;
+    };
 
 
-        <SortingState
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
 
-        <GroupingState />
-        <IntegratedGrouping />
-        <PagingState
-          currentPage={currentPage}
-          onCurrentPageChange={setCurrentPage}
-          pageSize={pageSize}
-          onPageSizeChange={changePageSize}
-        />
-        <CustomPaging
-          totalCount={totalCount}
-        />
-        <RowDetailState
+    const loadData = () => {
+        const queryString = getQueryString();
+        // Fetch products data from database
+        if (queryString !== lastQuery && !loading) {
+            setLoading(true);
+            fetch(queryString)
+                .then(response => response.json())
+                .then(({ content, totalElements }) => {
+                    console.log('Data from service products ' + content);
+                    console.log(content);
 
-        />
-        <Table
-          columnExtensions={tableColumnExtensions}
-        />
-        <TableFilterRow />
+                    setRows(content);
+                    setTotalCount(totalElements);
+                    setLoading(false);
+                })
+                .catch(() => setLoading(false));
+            setLastQuery(queryString);
+        }
+    };
 
-        <TableGroupRow />
-        <Toolbar />
-        <GroupingPanel />
 
-        <TableColumnResizing
-          columnWidths={columnWidths}
-          onColumnWidthsChange={setColumnWidths}
-        />
-        <TableColumnReordering
-          defaultOrder={['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
-        />
-        <TableHeaderRow showSortingControls />
-        <TableRowDetail
-          contentComponent={RowDetail}
-        />
-        <PagingPanel
-          pageSizes={pageSizes}
-        />
-      </Grid>
-      {loading && <Loading />}
-    </Paper>
-  );
+    useEffect(() => {
+
+        loadData();
+        // Listening price changes real time with Server-Sent Events
+        const sseForUsers = new EventSource(
+            `${URL_PRODUCTS_UPDATED}?size=${pageSize}&page=${currentPage}&sort=${sorting[0].columnName},${sorting[0].direction}`
+          );
+          sseForUsers.onopen = (e) => {
+            console.log("SSE 3 Connected !");
+          };
+          sseForUsers.addEventListener("products-event", (event) => {
+            let jsonData = JSON.parse(event.data);
+            setRows(jsonData);
+            console.log(jsonData);
+          });
+
+          sseForUsers.onerror = (error) => {
+            console.log("SSE For Users error", error);
+            sseForUsers.close();
+          };
+          return () => {
+            sseForUsers.close();
+          };
+    });
+
+    return (
+        <Paper style={{ position: 'relative' }}>
+            <Grid
+                rows={rows}
+                columns={columns}
+            >
+                <FilteringState defaultFilters={['title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
+                    columnExtensions={filteringStateColumnExtensions}
+                />
+                <IntegratedFiltering />
+
+                <DragDropProvider />
+
+                <CurrencyTypeProvider
+                    for={currencyColumns}
+                    formatterComponent={CurrencyFormatter}
+                />
+                <ImageTypeProvider
+                    for={imageColumns}
+                />
+
+                <LinkTypeProvider
+                    for={linkColumns}
+                    formatterComponent={LinkFormatter}
+                />
+
+
+                <SortingState
+                    sorting={sorting}
+                    onSortingChange={setSorting}
+                />
+
+                <GroupingState />
+                <IntegratedGrouping />
+                <PagingState
+                    currentPage={currentPage}
+                    onCurrentPageChange={setCurrentPage}
+                    pageSize={pageSize}
+                    onPageSizeChange={changePageSize}
+                />
+                <CustomPaging
+                    totalCount={totalCount}
+                />
+                <RowDetailState
+
+                />
+                <Table
+                    columnExtensions={tableColumnExtensions}
+                />
+                <TableFilterRow />
+
+                <TableGroupRow />
+                <Toolbar />
+                <GroupingPanel />
+
+                <TableColumnResizing
+                    columnWidths={columnWidths}
+                    onColumnWidthsChange={setColumnWidths}
+                />
+                <TableColumnReordering
+                    defaultOrder={['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
+                />
+                <TableHeaderRow showSortingControls />
+                <TableRowDetail
+                    contentComponent={RowDetail}
+                />
+                <PagingPanel
+                    pageSizes={pageSizes}
+                />
+            </Grid>
+            {loading && <Loading />}
+        </Paper>
+    );
 };

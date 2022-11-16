@@ -33,25 +33,35 @@ export default () => {
   }
 
   const handleLoadProduct = () => {
-    let queryString = `${URL_PRODUCTS}?asin==${inputValue}`;
+    let queryString = `${URL_PRODUCTS}?asin=${inputValue}`;
     setLoading(true);
     fetch(queryString, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: {},
+      body: null,
     })
-      .then(response => response.json())
-      .then(({ content, totalElements }) => {
-        console.log('Product found ' + content);
-        setProductLoaded(true);
-        setLoading(false);
-        setTimeout(() => {
-          setProductLoaded(false);
-        }, 5000);
+      .then(response => {
+        console.log('Product found ' + response.status);
+        if(response.status == 404){
+          console.log('Data not found');
+          setProductNotFound(true);
+          setLoading(false);
+  
+          setTimeout(() => {
+            setProductNotFound(false);
+          }, 5000);
+        }else{
+          setProductLoaded(true);
+          setLoading(false);
+          setTimeout(() => {
+            setProductLoaded(false);
+          }, 4000);
+        }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error:', error);
         console.log('Data not found');
         setProductNotFound(true);
         setLoading(false);
@@ -69,7 +79,7 @@ export default () => {
   return (
     <Paper style={{ position: 'relative', margin: '10' }}>
 
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+      {/* <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div className="d-block mb-4 mb-md-0" >
           <h4>Products</h4>
         </div>
@@ -104,11 +114,11 @@ export default () => {
         <CircularProgress />
       </Stack>}
       <Stack sx={{ width: '100%' }} spacing={2}>
-        {productNotFound && <Alert onClose={() => { setProductNotFound(false); }} severity="warning">The product with the asin [ {inputValue} ] was not found</Alert>}
+        {productNotFound && <Alert onClose={() => { setProductNotFound(false); }} severity="warning">The product with the asin '{inputValue}' was not found</Alert>}
         {productLoaded && <Alert onClose={() => {
           setProductLoaded(false);
         }} severity="success">The product was loaded sucessfully</Alert>}
-      </Stack>
+      </Stack> */}
       <App />
     </Paper>
   );
