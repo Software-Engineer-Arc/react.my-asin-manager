@@ -92,7 +92,7 @@ export default (props = {}) => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="MYASIN-Manager" link={Routes.Presentation.path} image={ReactHero} />
+              <NavItem title="MYASIN-Manager" link={Routes.Signin.path} image={ReactHero} />
 
               <NavItem title="Products" icon={faHandHoldingUsd} link={Routes.Transactions.path} /> 
               <NavItem title="Upload CSV" icon={faCog} link={Routes.Settings.path} />

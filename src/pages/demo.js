@@ -10,6 +10,12 @@ import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Link from '@mui/material/Link';
 
+import '@fontsource/public-sans';
+import CheckIcon from '@mui/icons-material/Check';
+
+import LabeledCheckboxMaterialUi from 'labeled-checkbox-material-ui';
+
+
 import {
     SortingState, SelectionState, FilteringState, PagingState, GroupingState, RowDetailState,
     IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider
@@ -30,12 +36,12 @@ import {
     employeeValues,
     employeeTaskValues,
 } from './generator';
-
+import Container from '@mui/material/Container';
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
 const URL_PRODUCTS = 'http://localhost:8080/products';
-
+const URL_CATEGORIES = 'http://localhost:8080/tags';
 const URL_PRODUCTS_UPDATED = 'http://localhost:8080/sse/product-prices';
 
 
@@ -54,6 +60,10 @@ const ImageFormatter = ({ value }) => (
 const LinkFormatter = ({ value }) => (
     <Link href={value}>Click here</Link>
 );
+
+const ListItem = styled('li')(({ theme }) => ({
+    margin: theme.spacing(0.5),
+}));
 
 
 const PREFIX = 'Demo';
@@ -114,7 +124,7 @@ const RowDetail = ({ row }) => (<StyledDiv className={classes.detailContainer}>
                 <Typography className={useStyles.title} color="textSecondary" gutterBottom>
                     Tags
                 </Typography>
-                <Chip label={row.details.tags} />
+                {row.details.tags.map(d => <Chip style={{ margin: 5 }} label={d} {...d} />)}
                 <Typography className={useStyles.title} color="textSecondary" gutterBottom>
                     Date
                 </Typography>
@@ -148,6 +158,10 @@ const LinkTypeProvider = props => (
     />
 );
 export default () => {
+    const [chipData, setChipData] = useState([]);
+
+    const [selected, setSelected] = React.useState(new Set());
+
 
     const [columns] = useState([
         { name: 'image', title: 'Image' },
@@ -173,12 +187,12 @@ export default () => {
     const [sorting, setSorting] = useState([{ columnName: 'title', direction: 'asc' }]);
     const [totalCount, setTotalCount] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [pageSizes] = useState([5, 10, 15]);
+    const [pageSizes] = useState([50, 100, 150]);
     const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [lastQuery, setLastQuery] = useState();
+    const [lastQuery, setLastQuery] = useState(URL_PRODUCTS);
     const [columnWidths, setColumnWidths] = useState([
-        { columnName: 'image', width: 150 },
+        { columnName: 'image', width: 100 },
         { columnName: 'title', width: 350 },
         { columnName: 'asin', width: 130 },
         { columnName: 'supplierLink', width: 130 },
@@ -194,6 +208,10 @@ export default () => {
         { columnName: 'image', filteringEnabled: false },
     ]);
 
+    const handleDelete = (chipToDelete) => () => {
+        setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
+    }
+
     const changePageSize = (value) => {
         const totalPages = Math.ceil(totalCount / value);
         const updatedCurrentPage = Math.min(currentPage, totalPages - 1);
@@ -202,8 +220,9 @@ export default () => {
         setCurrentPage(updatedCurrentPage);
     };
 
-    const getQueryString = () => {
-        let queryString = `${URL_PRODUCTS}?size=${pageSize}&page=${currentPage}`;
+    const getQueryStringProducts = () => {
+        let tags = generateTagsListString(selected);
+        let queryString = `${URL_PRODUCTS}?tags=${tags}&size=${pageSize}&page=${currentPage}`;
 
         if (sorting.length) {
             queryString = `${queryString}&sort=${sorting[0].columnName},${sorting[0].direction}`;
@@ -212,9 +231,30 @@ export default () => {
     };
 
 
+    const handleSelectionChanged = (id) => {
+        console.log(id);
+        const newSet = new Set(selected);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        setSelected(newSet);
+    };
+
+    // function that concatenates the elements of a set and return a string
+    const generateTagsListString = (set) => {
+        let str = '';
+        for (let elem of set) {
+            str += elem + ',';
+        }
+        return removeLastChar(str);
+    }
+    // fuction that removes the last character of a string
+    const removeLastChar = (str) => {
+        return str.slice(0, -1);
+    }
+
 
     const loadData = () => {
-        const queryString = getQueryString();
+        const queryString = getQueryStringProducts();
         // Fetch products data from database
         if (queryString !== lastQuery && !loading) {
             setLoading(true);
@@ -233,34 +273,83 @@ export default () => {
         }
     };
 
+    // make a fetch call to get the data
+    const fechCategories = () => {
+        fetch(URL_CATEGORIES)
+            .then(response => response.json())
+            .then((data) => {
+                console.log('Data from service categories ' + data);
+                setChipData(data);
+            })
+            .catch(() => {
+                console.log('Error fetching categories');
+            });
+    }
 
     useEffect(() => {
-
         loadData();
+        fechCategories();
+        let tags = generateTagsListString(selected);
+        console.log('Tags: ' + tags);
         // Listening price changes real time with Server-Sent Events
         const sseForUsers = new EventSource(
-            `${URL_PRODUCTS_UPDATED}?size=${pageSize}&page=${currentPage}&sort=${sorting[0].columnName},${sorting[0].direction}`
-          );
-          sseForUsers.onopen = (e) => {
+            `${URL_PRODUCTS_UPDATED}?tags=${tags}&size=${pageSize}&page=${currentPage}&sort=${sorting[0].columnName},${sorting[0].direction}`
+        );
+        sseForUsers.onopen = (e) => {
             console.log("SSE 3 Connected !");
-          };
-          sseForUsers.addEventListener("products-event", (event) => {
+        };
+        sseForUsers.addEventListener("products-event", (event) => {
             let jsonData = JSON.parse(event.data);
             setRows(jsonData);
             console.log(jsonData);
-          });
+        });
 
-          sseForUsers.onerror = (error) => {
+        sseForUsers.onerror = (error) => {
             console.log("SSE For Users error", error);
             sseForUsers.close();
-          };
-          return () => {
+        };
+        return () => {
             sseForUsers.close();
-          };
-    });
+        };
+    }, [currentPage, pageSize, sorting, lastQuery, loading, selected]);// currentPage, pageSize, sorting, lastQuery, loading, selected
+
 
     return (
-        <Paper style={{ position: 'relative' }}>
+        <Paper  >
+            <Card className={useStyles.root}>
+                <CardContent>
+                    <Typography style={{ marginLeft: 15 }} className={useStyles.title} color="textSecondary" gutterBottom>
+                        Tags
+                    </Typography>
+                    <Paper
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'start',
+                            flexWrap: 'wrap',
+                            listStyle: 'none',
+                            p: 0.5,
+                            m: 0,
+                        }}
+                        component="ul"
+                    >
+                        {chipData.map((data) => {
+                            let icon;
+
+                            return (
+                                <ListItem key={data.id}>
+                                    <Chip
+                                        key={data.id}
+                                        icon={icon}
+                                        label={data.name}
+                                        onClick={() => handleSelectionChanged(data.id)}
+                                        variant={selected.has(data.id) ? undefined : "outlined"}
+                                    />
+                                </ListItem>
+                            );
+                        })}
+                    </Paper>
+                </CardContent>
+            </Card>
             <Grid
                 rows={rows}
                 columns={columns}
