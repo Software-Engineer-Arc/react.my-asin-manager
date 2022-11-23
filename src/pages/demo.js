@@ -4,16 +4,29 @@ import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import Link from '@mui/material/Link';
-
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Dialog from '@mui/material/Dialog';
+import RadioGroup from '@mui/material/RadioGroup';
+import Radio from '@mui/material/Radio';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import '@fontsource/public-sans';
 import CheckIcon from '@mui/icons-material/Check';
-
+import PropTypes from 'prop-types';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import LabeledCheckboxMaterialUi from 'labeled-checkbox-material-ui';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 
 
 import {
@@ -37,13 +50,13 @@ import {
     employeeTaskValues,
 } from './generator';
 import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
 const URL_PRODUCTS = 'http://localhost:8080/products';
 const URL_CATEGORIES = 'http://localhost:8080/tags';
 const URL_PRODUCTS_UPDATED = 'http://localhost:8080/sse/product-prices';
-
 
 const CurrencyFormatter = ({ value }) => (
     <b style={{ color: 'darkgreen' }}>
@@ -56,6 +69,16 @@ const ImageFormatter = ({ value }) => (
         <img src={value} />
         {/* <Image src={value} /> */}
     </Paper>);
+
+const DateFormatter = ({ value }) => {
+    let date = new Date(value);
+    return (
+        <b style={{ color: 'darkgreen' }}>
+            {4}
+        </b>
+    );
+};
+
 
 const LinkFormatter = ({ value }) => (
     <Link href={value}>Click here</Link>
@@ -112,41 +135,17 @@ const tableDetailColumnExtensions = [
 ];
 
 
-const RowDetail = ({ row }) => (<StyledDiv className={classes.detailContainer}>
-    <div>
-        <h5 className={classes.title}>
-            Details:
-        </h5>
-    </div>
-    <Paper>
-        <Card className={useStyles.root}>
-            <CardContent>
-                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-                    Tags
-                </Typography>
-                {row.details.tags.map(d => <Chip style={{ margin: 5 }} label={d} {...d} />)}
-                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-                    Date
-                </Typography>
-                <Typography variant="body2" component="p">
-                    {row.details.date}
-                </Typography>
-                <Typography className={useStyles.title} color="textSecondary" gutterBottom>
-                    Notes
-                </Typography>
-                <Typography variant="body2" component="p">
-                    {row.details.notes}
-                </Typography>
-            </CardContent>
-
-        </Card>
-    </Paper>
-</StyledDiv>
-);
 
 const ImageTypeProvider = props => (
     <DataTypeProvider
         formatterComponent={ImageFormatter}
+        {...props}
+    />
+);
+
+const DateTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={DateFormatter}
         {...props}
     />
 );
@@ -158,27 +157,48 @@ const LinkTypeProvider = props => (
     />
 );
 export default () => {
+
+    const [openAddTags, setOpenAddTags] = React.useState(false);
+    const [value, setValue] = React.useState('Dione');
+
+    const handleClickListItem = () => {
+        setOpenAddTags(true);
+    };
+
+    const handleClose = (newValue) => {
+        setOpenAddTags(false);
+
+        if (newValue) {
+            setValue(newValue);
+        }
+    };
+    const [newTag, setNewTag] = useState('')
+
     const [chipData, setChipData] = useState([]);
 
     const [selected, setSelected] = React.useState(new Set());
-
+    let newNoteValue = '';
 
     const [columns] = useState([
         { name: 'image', title: 'Image' },
         { name: 'title', title: 'Title' },
         { name: 'asin', title: 'ASIN' },
+        { name: 'supplier', title: 'Supplier group' },
         { name: 'supplierLink', title: 'Supplier Link' },
         { name: 'currentBBPrice', title: 'BB Price' },
         { name: 'buyCost', title: 'Buy Cost' },
         { name: 'netMargin', title: 'Net Margin' },
+        { name: 'roi', title: 'ROI' },
         { name: 'currentBSR', title: 'BSR' },
         { name: 'fbaSellerCount', title: 'FBA Seller count' },
 
     ]);
     const [rows, setRows] = useState([]);
-    const [currencyColumns] = useState(['currentBBPrice', 'buyCost', 'netMargin', 'currentBSR']);
+    const [currencyColumns] = useState(['currentBBPrice', 'buyCost', 'netMargin']);
     const [imageColumns] = useState(['image']);
     const [linkColumns] = useState(['supplierLink']);
+    const [dateColumns] = useState(['details.date']);
+
 
     const [tableColumnExtensions] = useState([
         { columnName: 'title', align: 'left' },
@@ -195,22 +215,20 @@ export default () => {
         { columnName: 'image', width: 100 },
         { columnName: 'title', width: 350 },
         { columnName: 'asin', width: 130 },
+        { columnName: 'supplier', width: 140 },
         { columnName: 'supplierLink', width: 130 },
-        { columnName: 'currentBBPrice', width: 130 },
+        { columnName: 'currentBBPrice', width: 100 },
         { columnName: 'buyCost', width: 100 },
-        { columnName: 'netMargin', width: 130 },
-        { columnName: 'currentBSR', width: 130 },
+        { columnName: 'netMargin', width: 120 },
+        { columnName: 'roi', width: 100 },
+        { columnName: 'currentBSR', width: 100 },
         { columnName: 'fbaSellerCount', width: 150 },
     ]);
-    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']);
+    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']);
 
     const [filteringStateColumnExtensions] = useState([
         { columnName: 'image', filteringEnabled: false },
     ]);
-
-    const handleDelete = (chipToDelete) => () => {
-        setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
-    }
 
     const changePageSize = (value) => {
         const totalPages = Math.ceil(totalCount / value);
@@ -219,6 +237,8 @@ export default () => {
         setPageSize(value);
         setCurrentPage(updatedCurrentPage);
     };
+
+
 
     const getQueryStringProducts = () => {
         let tags = generateTagsListString(selected);
@@ -239,6 +259,7 @@ export default () => {
         setSelected(newSet);
     };
 
+
     // function that concatenates the elements of a set and return a string
     const generateTagsListString = (set) => {
         let str = '';
@@ -252,16 +273,21 @@ export default () => {
         return str.slice(0, -1);
     }
 
+    const handleDelete = (set, id) => {
+        //  setSelected(set.filter((chip) => chip !== id));
+    };
 
-    const loadData = () => {
+
+    const loadData = (force = true) => {
         const queryString = getQueryStringProducts();
         // Fetch products data from database
-        if (queryString !== lastQuery && !loading) {
+
+        if (force || (queryString !== lastQuery && !loading)) {
             setLoading(true);
             fetch(queryString)
                 .then(response => response.json())
                 .then(({ content, totalElements }) => {
-                    console.log('Data from service products ' + content);
+                    console.log('Data from service products ', content);
                     console.log(content);
 
                     setRows(content);
@@ -278,7 +304,7 @@ export default () => {
         fetch(URL_CATEGORIES)
             .then(response => response.json())
             .then((data) => {
-                console.log('Data from service categories ' + data);
+                console.log('Data from service categories ', data);
                 setChipData(data);
             })
             .catch(() => {
@@ -287,7 +313,7 @@ export default () => {
     }
 
     useEffect(() => {
-        loadData();
+        loadData(false);
         fechCategories();
         let tags = generateTagsListString(selected);
         console.log('Tags: ' + tags);
@@ -313,6 +339,238 @@ export default () => {
         };
     }, [currentPage, pageSize, sorting, lastQuery, loading, selected]);// currentPage, pageSize, sorting, lastQuery, loading, selected
 
+    const ConfirmationDialogRaw = (props) => {
+        const { productId, onClose, value: valueProp, open, ...other } = props;
+        const [value, setValue] = React.useState(valueProp);
+        const radioGroupRef = React.useRef(null);
+
+        const [containsTag, setContainsTag] = React.useState(false);
+
+        let selectedTag = new Set();
+        let newTagValue = '';
+
+
+        React.useEffect(() => {
+            if (!open) {
+                setValue(valueProp);
+            }
+        }, []);
+
+
+        const handleCancel = () => {
+            onClose();
+        };
+
+        const handleSave = () => {
+            console.log('Selected tags ', selectedTag);
+            console.log('Product id ', productId);
+            setLoading(true);
+            if (newTagValue != null && newTagValue !== '') {
+                let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/assing-tag?name=${newTagValue}`;
+                console.log('Url ', URL_ADD_TAGS);
+
+                fetch(URL_ADD_TAGS, {
+                    method: 'POST', // or 'PUT'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: {},
+                })
+                    .then((data) => {
+                        loadData(true);
+                        newTagValue = '';
+                        console.log('Tag added successfully');
+                    })
+                    .catch((e) => {
+                        newTagValue = '';
+                        setLoading(false);
+                        console.log('Error adding tag', e);
+                    });
+
+            } else {
+                let tagStrings = generateTagsListString(selectedTag);
+                let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/add-tags?tags=${tagStrings}`;
+                console.log('Url ', URL_ADD_TAGS);
+                fetch(URL_ADD_TAGS, {
+                    method: 'POST', // or 'PUT'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: {},
+                })
+                    .then((data) => {
+                        loadData(true);
+                        console.log('Tag added successfully');
+                    })
+                    .catch((e) => {
+                        setLoading(false);
+                        console.error('Error adding tag', e);
+                    });
+            }
+            onClose();
+
+        };
+
+        const handleTagSelectionChanged = (id) => {
+            console.log(id);
+            const nSet = new Set(selectedTag);
+            if (nSet.has(id)) { nSet.delete(id); }
+            else nSet.add(id);
+            selectedTag = new Set(nSet);
+
+            if (selectedTag.size > 0) {
+                setContainsTag(true);
+            } else {
+                setContainsTag(false);
+            }
+        };
+
+        const onChangeNewTag = (event) => {
+            newTagValue = event.target.value;
+        }
+
+        return (
+            <Dialog
+                sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+                maxWidth="xs"
+
+                open={open}
+                {...other}
+            >
+                <DialogTitle>Set tags</DialogTitle>
+                <DialogContent dividers>
+                    <FormGroup>
+                        {chipData.map((data) => (
+                            <FormControlLabel control={<Checkbox />} label={data.name} key={data.id}
+                                onClick={() => handleTagSelectionChanged(data.id)}
+                            />
+                        ))}
+                        <br />
+                        <FormControlLabel control={<Box
+                            sx={{
+                                width: '100%',
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <TextField disabled={false} fullWidth label="New tag" id="fullWidth" onChange={onChangeNewTag} />
+                        </Box>} />
+                    </FormGroup>
+                </DialogContent>
+                <DialogActions>
+                    <Button autoFocus onClick={handleCancel}>
+                        Cancel
+                    </Button>
+                    <Button onClick={() => handleSave()}>Save</Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    ConfirmationDialogRaw.propTypes = {
+        onClose: PropTypes.func.isRequired,
+        open: PropTypes.bool.isRequired,
+        value: PropTypes.string.isRequired,
+    };
+
+    const RowDetail = ({ row }) => {
+
+        const [valueText, setValueText] = useState(row.details.notes);
+        const onChangeEvent = (event) => {
+            setValueText(event.target.value);
+        }
+
+        const handleAddNewNotes = (productId) => {
+            setLoading(true);
+            let URL_ADD_NOTES = `${URL_PRODUCTS}/${productId}/add-notes?notes=${valueText}`;
+            console.log('Url ', URL_ADD_NOTES);
+            setValueText('');
+            fetch(URL_ADD_NOTES, {
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: {},
+            })
+                .then((data) => {
+                    loadData(true);
+                    //newTagValue = '';
+                    console.log('Notes added successfully');
+                })
+                .catch((e) => {
+                    // newTagValue = '';
+                    setLoading(false);
+                    console.log('Error adding notes', e);
+                });
+        };
+        React.useEffect(() => {
+
+        }, [valueText]);
+
+        return (<StyledDiv className={classes.detailContainer}>
+            <div>
+                <h5 className={classes.title}>
+                    Details:
+                </h5>
+            </div>
+            <Paper>
+                <Card className={useStyles.root}>
+                    <CardContent>
+                        <Stack direction="row" spacing={3}>
+
+                            <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                                Tags
+                            </Typography>
+                            <Avatar sx={{ width: 4, height: 4 }}>
+                                <Fab onClick={handleClickListItem} color="primary" aria-label="add">
+                                    <AddIcon />
+                                </Fab>
+                            </Avatar>
+                        </Stack>
+                        <ConfirmationDialogRaw
+                            productId={row.id}
+                            keepMounted
+                            autoFocus={true}
+                            open={openAddTags}
+                            onClose={handleClose}
+                            value={value}
+                        />
+                        <Paper>
+                            <br />
+
+                            {row.details.tags.map((d) => {
+                                let icon;
+                                return (
+                                    <Chip icon={icon} style={{ margin: 5 }} label={d.name} {...d} key={d.id} />);
+                            })}
+                            <br />
+                        </Paper>
+                        <br />
+                        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                            Date
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {new Date(row.details.date).toLocaleDateString()}
+                        </Typography>
+                        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                            Notes
+                        </Typography>
+
+                        <TextareaAutosize
+                            maxRows={4}
+                            minRows={3}
+                            value={valueText}
+                            placeholder="Add notes"
+                            style={{ width: '50%' }}
+                            onChange={onChangeEvent}
+                        />
+                        <br />
+                        <Button disabled={(valueText != undefined && valueText.length > 0) ? false : true} onClick={() => handleAddNewNotes(row.id)} variant="outlined">Add note</Button>
+                    </CardContent>
+                </Card>
+            </Paper>
+        </StyledDiv>
+        );
+    };
 
     return (
         <Paper  >
@@ -322,6 +580,7 @@ export default () => {
                         Tags
                     </Typography>
                     <Paper
+                        elevation={0}
                         sx={{
                             display: 'flex',
                             justifyContent: 'start',
@@ -354,13 +613,16 @@ export default () => {
                 rows={rows}
                 columns={columns}
             >
-                <FilteringState defaultFilters={['title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
+                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']}
                     columnExtensions={filteringStateColumnExtensions}
                 />
                 <IntegratedFiltering />
 
                 <DragDropProvider />
-
+                <DateTypeProvider
+                    for={dateColumns}
+                    formatterComponent={DateFormatter}
+                />
                 <CurrencyTypeProvider
                     for={currencyColumns}
                     formatterComponent={CurrencyFormatter}
@@ -408,7 +670,7 @@ export default () => {
                     onColumnWidthsChange={setColumnWidths}
                 />
                 <TableColumnReordering
-                    defaultOrder={['image', 'title', 'asin', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'currentBSR', 'fbaSellerCount']}
+                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']}
                 />
                 <TableHeaderRow showSortingControls />
                 <TableRowDetail

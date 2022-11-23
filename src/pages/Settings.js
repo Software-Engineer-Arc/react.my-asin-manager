@@ -10,8 +10,8 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 export default () => {
   return (
     <>
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-        <Dropdown>
+      {/* <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4"> */}
+        {/* <Dropdown>
           <Dropdown.Toggle as={Button} variant="secondary" className="text-dark me-2">
             <FontAwesomeIcon icon={faPlus} className="me-2" />
             <span>New</span>
@@ -33,10 +33,10 @@ export default () => {
               <FontAwesomeIcon icon={faRocket} className="text-danger me-2" /> Subscription Plan
               </Dropdown.Item>
           </Dropdown.Menu>
-        </Dropdown>
+        </Dropdown> */}
 
-        <div className="d-flex">
-          <Dropdown>
+        {/* <div className="d-flex"> */}
+          {/* <Dropdown>
             <Dropdown.Toggle as={Button} variant="primary">
               <FontAwesomeIcon icon={faClipboard} className="me-2" /> Reports
               <span className="icon icon-small ms-1"><FontAwesomeIcon icon={faChevronDown} /></span>
@@ -53,32 +53,24 @@ export default () => {
               </Dropdown.Item>
               <Dropdown.Item>
                 <FontAwesomeIcon icon={faChartPie} className="me-2" /> Console
-              </Dropdown.Item>
+              </Dropdown.Item> */}
 
               <Dropdown.Divider />
-
+{/* 
               <Dropdown.Item>
                 <FontAwesomeIcon icon={faRocket} className="text-success me-2" /> All Reports
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-      </div>
+              </Dropdown.Item> */}
+            {/* </Dropdown.Menu>
+          </Dropdown> */}
+        {/* </div>
+      </div> */}
 
       <Row>
-        <Col xs={12} xl={8}>
+        <Col>
           <GeneralInfoForm />
         </Col>
 
-        <Col xs={12} xl={4}>
-          <Row>
-            <Col xs={12}>
-            </Col>
-            <Col xs={12}>
-         
-            </Col>
-          </Row>
-        </Col>
+    
       </Row>
     </>
   );
