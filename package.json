@@ -59,6 +59,7 @@
     "namor": "^2.0.4",
     "react": "^16.13.1",
     "react-copy-to-clipboard": "^5.0.3",
+    "react-csv-importer": "^0.7.1",
     "react-datetime": "^3.0.4",
     "react-dom": "^16.13.1",
     "react-github-btn": "^1.2.0",
@@ -79,7 +80,8 @@
     "sass": "^1.55.0",
     "simplebar-react": "^2.3.0",
     "styled-components": "^5.3.6",
-    "tabulator-tables": "^5.4.2"
+    "tabulator-tables": "^5.4.2",
+    "use-csv": "^0.0.9"
   },
   "scripts": {
     "start": "react-scripts start",

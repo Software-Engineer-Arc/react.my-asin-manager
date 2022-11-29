@@ -27,16 +27,19 @@ import Stack from '@mui/material/Stack';
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-
+import Input from '@mui/material/Input';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 import {
     SortingState, SelectionState, FilteringState, PagingState, GroupingState, RowDetailState,
-    IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider
+    IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider,
+    EditingState
 } from '@devexpress/dx-react-grid';
 import {
     Grid, Table, TableBandHeader, TableHeaderRow,
     TableFilterRow, TableSelection, TableGroupRow, TableRowDetail,
-    GroupingPanel, PagingPanel, DragDropProvider, TableColumnReordering, TableColumnResizing, Toolbar,
+    GroupingPanel, PagingPanel, DragDropProvider, TableColumnReordering, TableColumnResizing, Toolbar, TableEditColumn, TableEditRow
 } from '@devexpress/dx-react-grid-material-ui';
 import { styled } from '@mui/material/styles';
 
@@ -64,6 +67,12 @@ const CurrencyFormatter = ({ value }) => (
     </b>
 );
 
+const CurrencyFormatterBuyCost = ({ value }) => (
+    <b style={{ color: 'darkblue' }}>
+        {value != undefined  ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '' }
+    </b>
+);
+
 const ImageFormatter = ({ value }) => (
     <Paper elevation={0}>
         <img src={value} />
@@ -81,7 +90,40 @@ const DateFormatter = ({ value }) => {
 
 
 const LinkFormatter = ({ value }) => (
-    <Link href={value}>Click here</Link>
+    <Link target="_blank" href={value}>Click here</Link>
+);
+
+
+const UrlFormatter = ({ value }) => {
+    let url = `https://www.amazon.com/dp/${value}`;
+    return (<Link target="_blank" href={url}>{value}</Link>);
+};
+
+// Edit formatter for the boolean type
+const BooleanFormatter = ({ value }) => <Chip label={value ? 'Yes' : 'No'} />;
+
+const BooleanEditor = ({ value, onValueChange }) => (
+    <Select
+        input={<Input />}
+        value={value ? 'Yes' : 'No'}
+        onChange={event => onValueChange(event.target.value === 'Yes')}
+        style={{ width: '100%' }}
+    >
+        <MenuItem value="Yes">
+            Yes
+        </MenuItem>
+        <MenuItem value="No">
+            No
+        </MenuItem>
+    </Select>
+);
+
+const BooleanTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={BooleanFormatter}
+        editorComponent={BooleanEditor}
+        {...props}
+    />
 );
 
 const ListItem = styled('li')(({ theme }) => ({
@@ -156,6 +198,28 @@ const LinkTypeProvider = props => (
         {...props}
     />
 );
+
+const UrlTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={UrlFormatter}
+        {...props}
+    />
+);
+
+const FixedPricesProvider = props => (
+    <DataTypeProvider
+        formatterComponent={CurrencyFormatter}
+        {...props}
+    />
+);
+
+const BuyCostPricesProvider = props => (
+    <DataTypeProvider
+        formatterComponent={CurrencyFormatterBuyCost}
+        {...props}
+    />
+);
+
 export default () => {
 
     const [openAddTags, setOpenAddTags] = React.useState(false);
@@ -178,12 +242,13 @@ export default () => {
 
     const [selected, setSelected] = React.useState(new Set());
     let newNoteValue = '';
+    // Edditing cells
 
     const [columns] = useState([
         { name: 'image', title: 'Image' },
         { name: 'title', title: 'Title' },
         { name: 'asin', title: 'ASIN' },
-        { name: 'supplier', title: 'Supplier group' },
+        { name: 'supplier', title: 'Supplier' },
         { name: 'supplierLink', title: 'Supplier Link' },
         { name: 'currentBBPrice', title: 'BB Price' },
         { name: 'buyCost', title: 'Buy Cost' },
@@ -194,9 +259,11 @@ export default () => {
 
     ]);
     const [rows, setRows] = useState([]);
-    const [currencyColumns] = useState(['currentBBPrice', 'buyCost', 'netMargin']);
+    const [currencyColumns] = useState(['currentBBPrice', 'netMargin']);
+    const [currencyCostColumns] = useState(['buyCost']);
     const [imageColumns] = useState(['image']);
     const [linkColumns] = useState(['supplierLink']);
+    const [urlColumns] = useState(['asin']);
     const [dateColumns] = useState(['details.date']);
 
 
@@ -312,6 +379,88 @@ export default () => {
             });
     }
 
+    const commitChanges = ({ added, changed, deleted }) => {
+        let changedRows;
+        if (added) {
+            const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
+            changedRows = [
+                ...rows,
+                ...added.map((row, index) => ({
+                    id: startingAddedId + index,
+                    ...row,
+                })),
+            ];
+        }
+        if (changed) {
+            let keys = Object.keys(changed);
+            let idKey = keys[0];
+            let updateUbject = changed[idKey];
+            let productToBeUpdated = rows[idKey];
+            console.log('Product to be updated', changedRows);
+            if (updateUbject == undefined){
+                return;
+            }
+            if(updateUbject.supplier != undefined){
+                productToBeUpdated.supplier = updateUbject.supplier;
+            }
+            if(updateUbject.supplierLink != undefined){
+                productToBeUpdated.supplierLink = updateUbject.supplierLink;
+            }
+            if(updateUbject.buyCost != undefined){
+                productToBeUpdated.buyCost = updateUbject.buyCost;
+            }
+            let URL_UPDATE_PRODUCT= `${URL_PRODUCTS}/${productToBeUpdated.id}/update-product`;
+            console.log('Url update products', URL_UPDATE_PRODUCT);
+            setLoading(true);
+
+            fetch(URL_UPDATE_PRODUCT, {
+                method: 'PUT', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productToBeUpdated),
+            })
+                .then((data) => {
+                    setLoading(false);
+                    console.log('Product Updated sucessfully');
+                })
+                .catch((e) => {
+                    setLoading(false);
+                    console.log('Filed updating product', e);
+                });
+        }
+        if (deleted) {
+            console.log('Delete id row', deleted[0]);
+
+            let idKey = deleted[0];
+            let productToBeDeleted = rows[idKey];
+            console.log('Product to be deleted ', productToBeDeleted);
+            if (productToBeDeleted == undefined || productToBeDeleted == null){
+                return;
+            }
+
+            let URL_DELETE_PRODUCT= `${URL_PRODUCTS}/${productToBeDeleted.id}/delete-product`;
+            console.log('Url delete products', URL_DELETE_PRODUCT);
+            setLoading(true);
+
+            fetch(URL_DELETE_PRODUCT, {
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: {},
+            })
+                .then((data) => {
+                    loadData(true);
+                    console.log('Product Deleted sucessfully');
+                })
+                .catch((e) => {
+                    loadData(true);
+                    console.log('Failed deleting product', e);
+                });
+        }
+    };
+
     useEffect(() => {
         loadData(false);
         fechCategories();
@@ -340,15 +489,13 @@ export default () => {
     }, [currentPage, pageSize, sorting, lastQuery, loading, selected]);// currentPage, pageSize, sorting, lastQuery, loading, selected
 
     const ConfirmationDialogRaw = (props) => {
-        const { productId, onClose, value: valueProp, open, ...other } = props;
+        const { productId, tags, onClose, value: valueProp, open, ...other } = props;
         const [value, setValue] = React.useState(valueProp);
         const radioGroupRef = React.useRef(null);
-
         const [containsTag, setContainsTag] = React.useState(false);
-
-        let selectedTag = new Set();
-        let newTagValue = '';
-
+        const [selectedTag, setSelectedTag] = React.useState(new Set(tags.map(t => t.id)));
+        const [newTagValue, setNewTagValue] = React.useState('');
+   
 
         React.useEffect(() => {
             if (!open) {
@@ -413,20 +560,19 @@ export default () => {
 
         const handleTagSelectionChanged = (id) => {
             console.log(id);
-            const nSet = new Set(selectedTag);
-            if (nSet.has(id)) { nSet.delete(id); }
-            else nSet.add(id);
-            selectedTag = new Set(nSet);
+            if (selectedTag.has(id)) { selectedTag.delete(id); }
+            else { selectedTag.add(id); }
 
             if (selectedTag.size > 0) {
                 setContainsTag(true);
             } else {
                 setContainsTag(false);
             }
+            console.log('TAGS ', selectedTag);
         };
 
         const onChangeNewTag = (event) => {
-            newTagValue = event.target.value;
+            setNewTagValue(event.target.value);
         }
 
         return (
@@ -441,7 +587,7 @@ export default () => {
                 <DialogContent dividers>
                     <FormGroup>
                         {chipData.map((data) => (
-                            <FormControlLabel control={<Checkbox />} label={data.name} key={data.id}
+                            <FormControlLabel control={<Checkbox checked={selectedTag.has(data.id)} disabled={newTagValue.length>0} />} label={data.name} key={data.id}
                                 onClick={() => handleTagSelectionChanged(data.id)}
                             />
                         ))}
@@ -528,6 +674,7 @@ export default () => {
                         </Stack>
                         <ConfirmationDialogRaw
                             productId={row.id}
+                            tags={row.details.tags}
                             keepMounted
                             autoFocus={true}
                             open={openAddTags}
@@ -572,6 +719,12 @@ export default () => {
         );
     };
 
+    const onEditColumn = (columnName) => {
+        if (columnName == 'supplier' || columnName == 'supplierLink' || columnName == 'buyCost') {
+            return true;
+        }
+        return false;
+    }
     return (
         <Paper  >
             <Card className={useStyles.root}>
@@ -623,17 +776,36 @@ export default () => {
                     for={dateColumns}
                     formatterComponent={DateFormatter}
                 />
-                <CurrencyTypeProvider
+                <FixedPricesProvider
                     for={currencyColumns}
                     formatterComponent={CurrencyFormatter}
+
+                />
+                <BuyCostPricesProvider
+                    for={currencyCostColumns}
+                    CurrencyFormatter={CurrencyFormatterBuyCost}
                 />
                 <ImageTypeProvider
                     for={imageColumns}
+
                 />
 
                 <LinkTypeProvider
                     for={linkColumns}
                     formatterComponent={LinkFormatter}
+                />
+
+                <UrlTypeProvider
+                    for={urlColumns}
+                    formatterComponent={UrlFormatter}
+
+                />
+
+                <EditingState
+                    onCommitChanges={commitChanges}
+                    columnEditingEnabled={false}
+                    columnExtensions={[{ columnName: "netMargin", editingEnabled: false }, { columnName: "asin", editingEnabled: false }, { columnName: "supplier", editingEnabled: true }, { columnName: "supplierLink", editingEnabled: true }, { columnName: "buyCost", editingEnabled: true }]}
+
                 />
 
 
@@ -673,6 +845,14 @@ export default () => {
                     defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']}
                 />
                 <TableHeaderRow showSortingControls />
+                <TableEditRow />
+                <TableEditColumn
+     //               showAddCommand
+                    showEditCommand
+                    showDeleteCommand
+                    width={150}
+
+                />
                 <TableRowDetail
                     contentComponent={RowDetail}
                 />
