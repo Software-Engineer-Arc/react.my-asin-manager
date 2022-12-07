@@ -57,21 +57,40 @@ import TextField from '@mui/material/TextField';
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
-const URL_PRODUCTS = 'http://localhost:8080/products';
-const URL_CATEGORIES = 'http://localhost:8080/tags';
-const URL_PRODUCTS_UPDATED = 'http://localhost:8080/sse/product-prices';
+const URL_PRODUCTS = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
+const URL_CATEGORIES = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/tags';
+const URL_PRODUCTS_UPDATED = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sse/product-prices';
 
 const CurrencyFormatter = ({ value }) => (
     <b style={{ color: 'darkgreen' }}>
-        {value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+        {value != undefined ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ''}
     </b>
 );
 
 const CurrencyFormatterBuyCost = ({ value }) => (
     <b style={{ color: 'darkblue' }}>
-        {value != undefined  ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '' }
+        {value != undefined ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ''}
     </b>
 );
+
+
+const CurrencyFormatterROI = ({ value }) => {
+    let colorStyle;
+    if (value >= 30) {
+        colorStyle = 'darkgreen';
+    } else if (value > 0 && value < 30) {
+        colorStyle = 'orange';
+    } else {
+        colorStyle = 'red';
+    }
+    return (
+        <b style={{ color: colorStyle }}>
+            {value == undefined ? 'NA' : value}%
+        </b>
+    );
+};
+
+
 
 const ImageFormatter = ({ value }) => (
     <Paper elevation={0}>
@@ -220,6 +239,13 @@ const BuyCostPricesProvider = props => (
     />
 );
 
+const ROIPricesProvider = props => (
+    <DataTypeProvider
+        formatterComponent={CurrencyFormatterROI}
+        {...props}
+    />
+);
+
 export default () => {
 
     const [openAddTags, setOpenAddTags] = React.useState(false);
@@ -252,14 +278,14 @@ export default () => {
         { name: 'supplierLink', title: 'Supplier Link' },
         { name: 'currentBBPrice', title: 'BB Price' },
         { name: 'buyCost', title: 'Buy Cost' },
-        { name: 'netMargin', title: 'Net Margin' },
+        { name: 'netProfit', title: 'Net Profit' },
         { name: 'roi', title: 'ROI' },
         { name: 'currentBSR', title: 'BSR' },
         { name: 'fbaSellerCount', title: 'FBA Seller count' },
 
     ]);
     const [rows, setRows] = useState([]);
-    const [currencyColumns] = useState(['currentBBPrice', 'netMargin']);
+    const [currencyColumns] = useState(['currentBBPrice', 'netProfit']);
     const [currencyCostColumns] = useState(['buyCost']);
     const [imageColumns] = useState(['image']);
     const [linkColumns] = useState(['supplierLink']);
@@ -273,8 +299,8 @@ export default () => {
     ]);
     const [sorting, setSorting] = useState([{ columnName: 'title', direction: 'asc' }]);
     const [totalCount, setTotalCount] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-    const [pageSizes] = useState([50, 100, 150]);
+    const [pageSize, setPageSize] = useState(50);
+    const [pageSizes] = useState([50, 100, 200]);
     const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(false);
     const [lastQuery, setLastQuery] = useState(URL_PRODUCTS);
@@ -286,12 +312,12 @@ export default () => {
         { columnName: 'supplierLink', width: 130 },
         { columnName: 'currentBBPrice', width: 100 },
         { columnName: 'buyCost', width: 100 },
-        { columnName: 'netMargin', width: 120 },
+        { columnName: 'netProfit', width: 120 },
         { columnName: 'roi', width: 100 },
         { columnName: 'currentBSR', width: 100 },
         { columnName: 'fbaSellerCount', width: 150 },
     ]);
-    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']);
+    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']);
 
     const [filteringStateColumnExtensions] = useState([
         { columnName: 'image', filteringEnabled: false },
@@ -348,10 +374,11 @@ export default () => {
     const loadData = (force = true) => {
         const queryString = getQueryStringProducts();
         // Fetch products data from database
-
         if (force || (queryString !== lastQuery && !loading)) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const URL_PRODUCTS_BY_USERNAME = `${queryString}&username=${user.username}`;
             setLoading(true);
-            fetch(queryString)
+            fetch(URL_PRODUCTS_BY_USERNAME)
                 .then(response => response.json())
                 .then(({ content, totalElements }) => {
                     console.log('Data from service products ', content);
@@ -368,7 +395,10 @@ export default () => {
 
     // make a fetch call to get the data
     const fechCategories = () => {
-        fetch(URL_CATEGORIES)
+        const user = JSON.parse(localStorage.getItem("user"));
+        let authHeader =  { Authorization: "Bearer " + user.accessToken };
+         let URL_CATEGORIES_BY_USER = `${URL_CATEGORIES}?username=${user.username}`;
+        fetch(URL_CATEGORIES_BY_USER,{ headers: authHeader})
             .then(response => response.json())
             .then((data) => {
                 console.log('Data from service categories ', data);
@@ -397,31 +427,32 @@ export default () => {
             let updateUbject = changed[idKey];
             let productToBeUpdated = rows[idKey];
             console.log('Product to be updated', changedRows);
-            if (updateUbject == undefined){
+            if (updateUbject == undefined) {
                 return;
             }
-            if(updateUbject.supplier != undefined){
+            if (updateUbject.supplier != undefined) {
                 productToBeUpdated.supplier = updateUbject.supplier;
             }
-            if(updateUbject.supplierLink != undefined){
+            if (updateUbject.supplierLink != undefined) {
                 productToBeUpdated.supplierLink = updateUbject.supplierLink;
             }
-            if(updateUbject.buyCost != undefined){
+            if (updateUbject.buyCost != undefined) {
                 productToBeUpdated.buyCost = updateUbject.buyCost;
             }
-            let URL_UPDATE_PRODUCT= `${URL_PRODUCTS}/${productToBeUpdated.id}/update-product`;
+            let URL_UPDATE_PRODUCT = `${URL_PRODUCTS}/${productToBeUpdated.id}/update-product`;
             console.log('Url update products', URL_UPDATE_PRODUCT);
             setLoading(true);
-
+            const user = JSON.parse(localStorage.getItem("user"));
             fetch(URL_UPDATE_PRODUCT, {
                 method: 'PUT', // or 'PUT'
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user.accessToken 
                 },
                 body: JSON.stringify(productToBeUpdated),
             })
                 .then((data) => {
-                    setLoading(false);
+                    loadData(true);
                     console.log('Product Updated sucessfully');
                 })
                 .catch((e) => {
@@ -435,18 +466,20 @@ export default () => {
             let idKey = deleted[0];
             let productToBeDeleted = rows[idKey];
             console.log('Product to be deleted ', productToBeDeleted);
-            if (productToBeDeleted == undefined || productToBeDeleted == null){
+            if (productToBeDeleted == undefined || productToBeDeleted == null) {
                 return;
             }
 
-            let URL_DELETE_PRODUCT= `${URL_PRODUCTS}/${productToBeDeleted.id}/delete-product`;
+            let URL_DELETE_PRODUCT = `${URL_PRODUCTS}/${productToBeDeleted.id}/delete-product`;
             console.log('Url delete products', URL_DELETE_PRODUCT);
             setLoading(true);
+            const user = JSON.parse(localStorage.getItem("user"));
 
             fetch(URL_DELETE_PRODUCT, {
                 method: 'POST', // or 'PUT'
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user.accessToken 
                 },
                 body: {},
             })
@@ -495,7 +528,7 @@ export default () => {
         const [containsTag, setContainsTag] = React.useState(false);
         const [selectedTag, setSelectedTag] = React.useState(new Set(tags.map(t => t.id)));
         const [newTagValue, setNewTagValue] = React.useState('');
-   
+
 
         React.useEffect(() => {
             if (!open) {
@@ -513,13 +546,17 @@ export default () => {
             console.log('Product id ', productId);
             setLoading(true);
             if (newTagValue != null && newTagValue !== '') {
-                let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/assing-tag?name=${newTagValue}`;
+                const user = JSON.parse(localStorage.getItem("user"));
+                console.log('For username ',user );
+               
+                let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/assing-tag?name=${newTagValue}&username=${user.username}`;
                 console.log('Url ', URL_ADD_TAGS);
-
+               
                 fetch(URL_ADD_TAGS, {
                     method: 'POST', // or 'PUT'
                     headers: {
                         'Content-Type': 'application/json',
+                         'Authorization': "Bearer " + user.accessToken
                     },
                     body: {},
                 })
@@ -529,7 +566,6 @@ export default () => {
                         console.log('Tag added successfully');
                     })
                     .catch((e) => {
-                        newTagValue = '';
                         setLoading(false);
                         console.log('Error adding tag', e);
                     });
@@ -538,10 +574,13 @@ export default () => {
                 let tagStrings = generateTagsListString(selectedTag);
                 let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/add-tags?tags=${tagStrings}`;
                 console.log('Url ', URL_ADD_TAGS);
+
+                const user = JSON.parse(localStorage.getItem("user"));
                 fetch(URL_ADD_TAGS, {
                     method: 'POST', // or 'PUT'
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': "Bearer " + user.accessToken
                     },
                     body: {},
                 })
@@ -560,15 +599,17 @@ export default () => {
 
         const handleTagSelectionChanged = (id) => {
             console.log(id);
-            if (selectedTag.has(id)) { selectedTag.delete(id); }
-            else { selectedTag.add(id); }
+            let set = new Set(selectedTag);
+            if (set.has(id)) { set.delete(id); }
+            else { set.add(id); }
 
-            if (selectedTag.size > 0) {
+            if (set.size > 0) {
                 setContainsTag(true);
             } else {
                 setContainsTag(false);
             }
-            console.log('TAGS ', selectedTag);
+            setSelectedTag(set);
+            console.log('TAGS ', set);
         };
 
         const onChangeNewTag = (event) => {
@@ -587,7 +628,7 @@ export default () => {
                 <DialogContent dividers>
                     <FormGroup>
                         {chipData.map((data) => (
-                            <FormControlLabel control={<Checkbox checked={selectedTag.has(data.id)} disabled={newTagValue.length>0} />} label={data.name} key={data.id}
+                            <FormControlLabel control={<Checkbox checked={selectedTag.has(data.id)} disabled={newTagValue.length > 0} />} label={data.name} key={data.id}
                                 onClick={() => handleTagSelectionChanged(data.id)}
                             />
                         ))}
@@ -630,10 +671,13 @@ export default () => {
             let URL_ADD_NOTES = `${URL_PRODUCTS}/${productId}/add-notes?notes=${valueText}`;
             console.log('Url ', URL_ADD_NOTES);
             setValueText('');
+            const user = JSON.parse(localStorage.getItem("user"));
+
             fetch(URL_ADD_NOTES, {
                 method: 'POST', // or 'PUT'
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user.accessToken
                 },
                 body: {},
             })
@@ -766,7 +810,7 @@ export default () => {
                 rows={rows}
                 columns={columns}
             >
-                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']}
+                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']}
                     columnExtensions={filteringStateColumnExtensions}
                 />
                 <IntegratedFiltering />
@@ -785,6 +829,12 @@ export default () => {
                     for={currencyCostColumns}
                     CurrencyFormatter={CurrencyFormatterBuyCost}
                 />
+
+                <ROIPricesProvider
+                    for={['roi']}
+                    CurrencyFormatter={CurrencyFormatterROI}
+                />
+
                 <ImageTypeProvider
                     for={imageColumns}
 
@@ -804,7 +854,7 @@ export default () => {
                 <EditingState
                     onCommitChanges={commitChanges}
                     columnEditingEnabled={false}
-                    columnExtensions={[{ columnName: "netMargin", editingEnabled: false }, { columnName: "asin", editingEnabled: false }, { columnName: "supplier", editingEnabled: true }, { columnName: "supplierLink", editingEnabled: true }, { columnName: "buyCost", editingEnabled: true }]}
+                    columnExtensions={[{ columnName: "netProfit", editingEnabled: false }, { columnName: "asin", editingEnabled: false }, { columnName: "supplier", editingEnabled: true }, { columnName: "supplierLink", editingEnabled: true }, { columnName: "buyCost", editingEnabled: true }]}
 
                 />
 
@@ -842,12 +892,12 @@ export default () => {
                     onColumnWidthsChange={setColumnWidths}
                 />
                 <TableColumnReordering
-                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netMargin', 'roi', 'currentBSR', 'fbaSellerCount']}
+                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']}
                 />
                 <TableHeaderRow showSortingControls />
                 <TableEditRow />
                 <TableEditColumn
-     //               showAddCommand
+                    //               showAddCommand
                     showEditCommand
                     showDeleteCommand
                     width={150}

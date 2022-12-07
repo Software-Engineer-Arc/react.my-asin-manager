@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Switch, Redirect } from "react-router-dom";
-import { Routes } from "../routes";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 // pages
 import Presentation from "./Presentation";
 import Upgrade from "./Upgrade";
 import DashboardOverview from "./dashboard/DashboardOverview";
-import Transactions from "./Transactions";
+import Products from "./Products";
 import Settings from "./Settings";
 import BootstrapTables from "./tables/BootstrapTables";
 import Signin from "./examples/Signin";
@@ -49,7 +48,7 @@ import Tabs from "./components/Tabs";
 import Tooltips from "./components/Tooltips";
 import Toasts from "./components/Toasts";
 
-const RouteWithLoader = ({ component: Component, ...rest }) => {
+const RouteWithLoader = ({ element: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -58,11 +57,11 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
   }, []);
 
   return (
-    <Route {...rest} render={props => ( <> <Preloader show={loaded ? false : true} /> <Component {...props} /> </> ) } />
+    <Route {...rest} render={props => ( <> <Component {...props} /> </> ) } />
   );
 };
 
-const RouteWithSidebar = ({ component: Component, ...rest }) => {
+const RouteWithSidebar = ({ element: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -84,13 +83,10 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
   return (
     <Route {...rest} render={props => (
       <>
-        <Preloader show={loaded ? false : true} />
         <Sidebar />
-
         <main className="content">
           <Navbar />
           <Component {...props} />
-          <Footer toggleSettings={toggleSettings} showSettings={showSettings} />
         </main>
       </>
     )}
@@ -99,13 +95,12 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
 };
 
 export default () => (
-  <Switch>
+  <Routes>
    
     {/* pages */}
-    <RouteWithSidebar exact path={Routes.Transactions.path} component={Transactions} />
-    <RouteWithSidebar exact path={Routes.Settings.path} component={Settings} />
-    
-
-    <Redirect to={Routes.Transactions.path} />
-  </Switch>
+    <RouteWithSidebar exact path={Routes.Products.path} element={Products} />
+    <RouteWithSidebar exact path={Routes.Settings.path} element={Settings} />
+  
+    <Navigate to={Routes.Products.path} />
+  </Routes>
 );

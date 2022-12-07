@@ -30,13 +30,16 @@ import { ReactTabulator } from 'react-tabulator'
 
 import ReactDOM from "react-dom";
 import Demo from "./demo";
-
+import { Provider } from "react-redux";
+import store from "./store";
 
 
 
 function App() {
   return (
-    <Demo />
+    <Provider store={store}>
+      <Demo />
+    </Provider>
   );
 }
 

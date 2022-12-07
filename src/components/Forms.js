@@ -17,10 +17,11 @@ import { Importer, ImporterField } from "react-csv-importer";
 // theme CSS for React CSV Importer
 import "react-csv-importer/dist/index.css";
 import { Architecture } from "@mui/icons-material";
+import { useSelector, useDispatch } from 'react-redux';
 
 
-const URL_UPLOAD_CSV_FILE = 'http://localhost:8080/multipart-file/upload-filePart';
-const URL_CREATE_BATCH = 'http://localhost:8080/products/create-product-batch';
+const URL_UPLOAD_CSV_FILE = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/multipart-file/upload-filePart';
+const URL_CREATE_BATCH = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products/create-product-batch';
 
 export const GeneralInfoForm = () => {
   const [file, setFile] = useState()
@@ -58,7 +59,6 @@ export const GeneralInfoForm = () => {
     <Paper>
       <Card border="light" className="bg-white shadow-sm mb-4" >
         <Card.Body >
-
           <h4>Import from csv file</h4>
 
           <Importer
@@ -74,6 +74,9 @@ export const GeneralInfoForm = () => {
               // may be called several times if file is large
               // (if this callback returns a promise, the widget will wait for it before parsing more data)
               console.log("received batch of rows", rows);
+              const user = JSON.parse(localStorage.getItem("user"));
+              console.log('For username ',user );
+
               var employees = [];
               rows.forEach(row => {
                 var employee = {
@@ -85,7 +88,10 @@ export const GeneralInfoForm = () => {
                 employees.push(employee);
               });
               console.log(employees);
-              fetch(URL_CREATE_BATCH, {
+              let URL_ADD_CREATION_BATCH_USERNAMR = `${URL_CREATE_BATCH}?username=${user.username}`;
+              console.log('URL FOR BATCH ', URL_ADD_CREATION_BATCH_USERNAMR);
+
+              fetch(URL_ADD_CREATION_BATCH_USERNAMR , {
                 method: 'POST', // or 'PUT'
                 headers: {
                   'Content-Type': 'application/json',

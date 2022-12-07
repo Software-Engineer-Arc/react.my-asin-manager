@@ -34,7 +34,7 @@ import {
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
-const URL_PRODUCTS = 'http://localhost:8080/products';
+const URL_PRODUCTS = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
 
 
 const CurrencyFormatter = ({ value }) => (

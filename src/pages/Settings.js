@@ -1,17 +1,40 @@
-import React from "react";
+import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faFileAlt, faPlus, faRocket, faStore } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown } from '@themesberg/react-bootstrap';
 import { GeneralInfoForm } from "../components/Forms";
+import Home from "./Home";
+import { connect } from "react-redux";
 
 import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 
 
-export default () => {
+class  Settings extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <>
-      {/* <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4"> */}
+    this.state = {
+      currentUser: undefined,
+    };
+
+
+  }
+  componentDidMount() {
+    const user = this.props.user;
+    console.log('IN IMPORTING FILE');
+    if (user) {
+      this.setState({
+        currentUser: user
+      });
+    }
+  }
+
+  render() {
+    console.log('Rendering importing file');
+    const { currentUser } = this.state;
+    return (
+      <>
+        {/* <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4"> */}
         {/* <Dropdown>
           <Dropdown.Toggle as={Button} variant="secondary" className="text-dark me-2">
             <FontAwesomeIcon icon={faPlus} className="me-2" />
@@ -37,7 +60,7 @@ export default () => {
         </Dropdown> */}
 
         {/* <div className="d-flex"> */}
-          {/* <Dropdown>
+        {/* <Dropdown>
             <Dropdown.Toggle as={Button} variant="primary">
               <FontAwesomeIcon icon={faClipboard} className="me-2" /> Reports
               <span className="icon icon-small ms-1"><FontAwesomeIcon icon={faChevronDown} /></span>
@@ -56,23 +79,31 @@ export default () => {
                 <FontAwesomeIcon icon={faChartPie} className="me-2" /> Console
               </Dropdown.Item> */}
 
-              <Dropdown.Divider />
-{/* 
+        <Dropdown.Divider />
+        {/* 
               <Dropdown.Item>
                 <FontAwesomeIcon icon={faRocket} className="text-success me-2" /> All Reports
               </Dropdown.Item> */}
-            {/* </Dropdown.Menu>
+        {/* </Dropdown.Menu>
           </Dropdown> */}
         {/* </div>
       </div> */}
 
-      <Row>
-        <Col>
-          <GeneralInfoForm />
-        </Col>
+        <Row>
+            <Col>
+              <GeneralInfoForm />
+            </Col>
+         
+        </Row>
+      </>
+    );
+  }
+}
+function mapStateToProps(state) {
+  const { user } = state.auth;
+  return {
+    user,
+  };
+}
 
-    
-      </Row>
-    </>
-  );
-};
+export default connect(mapStateToProps)(Settings);

@@ -17,9 +17,9 @@ export default [
 
     {
         "id": 2,
-        "name": "Transactions",
+        "name": "Products",
         "image": TransactionsImg,
-        "link": Routes.Transactions.path
+        "link": Routes.Products.path
     },
     {
         "id": 3,
