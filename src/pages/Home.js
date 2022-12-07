@@ -97,6 +97,7 @@ export default () => {
               <Route path="/login" element={<Login setAuth={false} />} />
               <Route path="/home" element={<HomeCurrent />} />
               <Route path="/signup" element={<Signup setAuth={false} />} />
+              <Route path="/volt-react-dashboard" element={<Login setAuth={false} />} />
               <Route exact path={"/myasinmanager"} element={
                 localStorage.getItem('user') ? (<>
                   <Sidebar />
