@@ -11,15 +11,30 @@ import { Link } from 'react-router-dom';
 import { Routes } from "../routes";
 import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
-import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
+import ProfilePicture from "../assets/img/team/profile.png";
+import Divider from '@mui/material/Divider';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { logout } from "../pages/auth/actions/auth";
+
 
 export default (props = {}) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const location = useLocation();
   const { pathname } = location;
   const [show, setShow] = useState(false);
   const showClass = show ? "show" : "";
 
   const onCollapse = () => setShow(!show);
+  const onLogout = (e) => {
+    console.log('logout');
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  };
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const CollapsableNavItem = (props) => {
     const { eventKey, title, icon, children = null } = props;
@@ -69,14 +84,14 @@ export default (props = {}) => {
 
   return (
     <>
-      <Navbar expand={false} collapseOnSelect variant="dark" className="navbar-theme-primary px-4 d-md-none">
+      {/* <Navbar expand={false} collapseOnSelect variant="dark" className="navbar-theme-primary px-4 d-md-none">
         <Navbar.Brand className="me-lg-5" as={Link} to={Routes.DashboardOverview.path}>
           <Image src={ReactHero} className="navbar-brand-light" />
         </Navbar.Brand>
         <Navbar.Toggle as={Button} aria-controls="main-navbar" onClick={onCollapse}>
           <span className="navbar-toggler-icon" />
         </Navbar.Toggle>
-      </Navbar>
+      </Navbar> */}
       <CSSTransition timeout={300} in={show} classNames="sidebar-transition">
         <SimpleBar className={`collapse ${showClass} sidebar d-md-block bg-primary text-white`}>
           <div className="sidebar-inner px-4 pt-3">
@@ -85,21 +100,36 @@ export default (props = {}) => {
                 <div className="user-avatar lg-avatar me-4">
                   <Image src={ProfilePicture} className="card-img-top rounded-circle border-white" />
                 </div>
-           
+
               </div>
               <Nav.Link className="collapse-close d-md-none" onClick={onCollapse}>
                 <FontAwesomeIcon icon={faTimes} />
               </Nav.Link>
             </div>
-            <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="MYASIN-Manager" link={Routes.Presentation.path} image={ReactHero} />
+            <Nav className="flex-column pt-3 pt-md-0" >
+              {/* <NavItem title="MYASIN-Manager" link={Routes.Signin.path} image={ReactHero} /> */}
+              <NavItem title="MYASIN-Manager" image={ReactHero} />
+              <div className="d-flex align-items-left">
+                <div className="user-avatar lg-avatar me-2">
+                  <Image src={ProfilePicture} className="card-img-top rounded-circle border-white" />
+                </div>
+                <div className="d-block">
+                  <p><small>{user.fullName}</small></p>
+                  <Button as={Link} variant="secondary" size="xs" onClick={onLogout} className="text-dark">
+                    <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /> Sign Out
+                  </Button>
+                </div>
+              </div>
+              <br></br>
+              <br></br>
 
-              <NavItem title="Products" icon={faHandHoldingUsd} link={Routes.Transactions.path} /> 
-              <NavItem title="Upload CSV" icon={faCog} link={Routes.Settings.path} />
-             
-              <Dropdown.Divider className="my-3 border-indigo" />
+              <br></br>
+              <NavItem title="Products" icon={faHandHoldingUsd} link={Routes.Products.path} />
+              <NavItem title="Import file" icon={faCog} link={Routes.Settings.path} />
+              <Divider variant="middle" />
+  
             </Nav>
-          </div>                                
+          </div>
         </SimpleBar>
       </CSSTransition>
     </>
