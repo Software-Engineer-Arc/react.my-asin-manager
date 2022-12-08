@@ -33,7 +33,7 @@ const animate = {
   },
 };
 
-const API_URL = "http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
+const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
 const LoginForm = ({ setAuth }) => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";

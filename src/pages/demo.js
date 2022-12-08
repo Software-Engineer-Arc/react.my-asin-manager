@@ -57,9 +57,9 @@ import TextField from '@mui/material/TextField';
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
-const URL_PRODUCTS = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
-const URL_CATEGORIES = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/tags';
-const URL_PRODUCTS_UPDATED = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sse/product-prices';
+const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
+const URL_CATEGORIES = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/tags';
+const URL_PRODUCTS_UPDATED = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sse/product-prices';
 
 const CurrencyFormatter = ({ value }) => (
     <b style={{ color: 'darkgreen' }}>

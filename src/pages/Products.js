@@ -18,7 +18,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import App from './App'
 
 
-const URL_PRODUCTS = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sp-api/process-product';
+const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sp-api/process-product';
 
 export default () => {
   const [inputValue, setInputValue] = useState('');

@@ -20,8 +20,8 @@ import { Architecture } from "@mui/icons-material";
 import { useSelector, useDispatch } from 'react-redux';
 
 
-const URL_UPLOAD_CSV_FILE = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/multipart-file/upload-filePart';
-const URL_CREATE_BATCH = 'http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products/create-product-batch';
+const URL_UPLOAD_CSV_FILE = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/multipart-file/upload-filePart';
+const URL_CREATE_BATCH = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products/create-product-batch';
 
 export const GeneralInfoForm = () => {
   const [file, setFile] = useState()

@@ -27,7 +27,7 @@ const animate = {
     delay: 0.16,
   },
 };
-const API_URL = "http://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
+const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
 
 const SignupForm = ({ setAuth }) => {
   const navigate = useNavigate();
