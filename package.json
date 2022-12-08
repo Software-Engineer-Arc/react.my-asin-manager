@@ -13,6 +13,7 @@
     "bootstrap 5 dashboard",
     "themesberg"
   ],
+
   "license": "MIT",
   "homepage": "https://demo.themesberg.com/volt-react-dashboard",
   "bugs": {
@@ -89,7 +90,7 @@
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.2",
-    "sass": "^1.56.1",
+    "node-sass": "^4.14.1",
     "simplebar-react": "^2.3.0",
     "styled-components": "^5.3.6",
     "tabulator-tables": "^5.4.2",
