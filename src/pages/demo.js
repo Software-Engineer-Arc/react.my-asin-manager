@@ -60,7 +60,7 @@ const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/order
 const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
 const URL_CATEGORIES = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/tags';
 const URL_PRODUCTS_UPDATED = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sse/product-prices';
-
+const https = require('https');
 const CurrencyFormatter = ({ value }) => (
     <b style={{ color: 'darkgreen' }}>
         {value != undefined ? value.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : ''}
@@ -373,12 +373,17 @@ export default () => {
 
     const loadData = (force = true) => {
         const queryString = getQueryStringProducts();
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: false,
+        });
         // Fetch products data from database
         if (force || (queryString !== lastQuery && !loading)) {
             const user = JSON.parse(localStorage.getItem("user"));
             const URL_PRODUCTS_BY_USERNAME = `${queryString}&username=${user.username}`;
             setLoading(true);
-            fetch(URL_PRODUCTS_BY_USERNAME)
+            fetch(URL_PRODUCTS_BY_USERNAME, {
+                agent: httpsAgent
+            })
                 .then(response => response.json())
                 .then(({ content, totalElements }) => {
                     console.log('Data from service products ', content);
@@ -395,10 +400,13 @@ export default () => {
 
     // make a fetch call to get the data
     const fechCategories = () => {
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: false,
+        });
         const user = JSON.parse(localStorage.getItem("user"));
-        let authHeader =  { Authorization: "Bearer " + user.accessToken };
-         let URL_CATEGORIES_BY_USER = `${URL_CATEGORIES}?username=${user.username}`;
-        fetch(URL_CATEGORIES_BY_USER,{ headers: authHeader})
+        let authHeader = { Authorization: "Bearer " + user.accessToken };
+        let URL_CATEGORIES_BY_USER = `${URL_CATEGORIES}?username=${user.username}`;
+        fetch(URL_CATEGORIES_BY_USER, { headers: authHeader, agent: httpsAgent })
             .then(response => response.json())
             .then((data) => {
                 console.log('Data from service categories ', data);
@@ -410,6 +418,9 @@ export default () => {
     }
 
     const commitChanges = ({ added, changed, deleted }) => {
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: false,
+          });
         let changedRows;
         if (added) {
             const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
@@ -447,8 +458,9 @@ export default () => {
                 method: 'PUT', // or 'PUT'
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': "Bearer " + user.accessToken 
+                    'Authorization': "Bearer " + user.accessToken
                 },
+                agent: httpsAgent,
                 body: JSON.stringify(productToBeUpdated),
             })
                 .then((data) => {
@@ -479,8 +491,9 @@ export default () => {
                 method: 'POST', // or 'PUT'
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': "Bearer " + user.accessToken 
+                    'Authorization': "Bearer " + user.accessToken
                 },
+                agent: httpsAgent,
                 body: {},
             })
                 .then((data) => {
@@ -542,22 +555,26 @@ export default () => {
         };
 
         const handleSave = () => {
+            const httpsAgent = new https.Agent({
+                rejectUnauthorized: false,
+              });
             console.log('Selected tags ', selectedTag);
             console.log('Product id ', productId);
             setLoading(true);
             if (newTagValue != null && newTagValue !== '') {
                 const user = JSON.parse(localStorage.getItem("user"));
-                console.log('For username ',user );
-               
+                console.log('For username ', user);
+
                 let URL_ADD_TAGS = `${URL_PRODUCTS}/${productId}/assing-tag?name=${newTagValue}&username=${user.username}`;
                 console.log('Url ', URL_ADD_TAGS);
-               
+
                 fetch(URL_ADD_TAGS, {
                     method: 'POST', // or 'PUT'
                     headers: {
                         'Content-Type': 'application/json',
-                         'Authorization': "Bearer " + user.accessToken
+                        'Authorization': "Bearer " + user.accessToken
                     },
+                    agent: httpsAgent,
                     body: {},
                 })
                     .then((data) => {
@@ -582,6 +599,7 @@ export default () => {
                         'Content-Type': 'application/json',
                         'Authorization': "Bearer " + user.accessToken
                     },
+                    agent: httpsAgent,
                     body: {},
                 })
                     .then((data) => {
@@ -667,6 +685,9 @@ export default () => {
         }
 
         const handleAddNewNotes = (productId) => {
+            const httpsAgent = new https.Agent({
+                rejectUnauthorized: false,
+              });
             setLoading(true);
             let URL_ADD_NOTES = `${URL_PRODUCTS}/${productId}/add-notes?notes=${valueText}`;
             console.log('Url ', URL_ADD_NOTES);
@@ -679,6 +700,7 @@ export default () => {
                     'Content-Type': 'application/json',
                     'Authorization': "Bearer " + user.accessToken
                 },
+                agent: httpsAgent,
                 body: {},
             })
                 .then((data) => {

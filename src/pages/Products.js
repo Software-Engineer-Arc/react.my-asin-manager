@@ -19,7 +19,7 @@ import App from './App'
 
 
 const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sp-api/process-product';
-
+const https = require('https');
 export default () => {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,12 +35,16 @@ export default () => {
 
   const handleLoadProduct = () => {
     let queryString = `${URL_PRODUCTS}?asin=${inputValue}`;
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
     setLoading(true);
     fetch(queryString, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      agent:httpsAgent,
       body: null,
     })
       .then(response => {

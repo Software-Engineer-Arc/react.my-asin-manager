@@ -36,6 +36,7 @@ const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/order
 
 const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
 
+const https = require('https');
 
 const CurrencyFormatter = ({ value }) => (
   <b style={{ color: 'darkgreen' }}>
@@ -212,10 +213,15 @@ export default () => {
 
 
   const loadData = () => {
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
     const queryString = getQueryString();
     if (queryString !== lastQuery && !loading) {
       setLoading(true);
-      fetch(queryString)
+      fetch(queryString, {
+        agent: httpsAgent,
+      })
         .then(response => response.json())
         .then(({ content, totalElements }) => {
           console.log('Data from service products ' + content);

@@ -22,6 +22,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 const URL_UPLOAD_CSV_FILE = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/multipart-file/upload-filePart';
 const URL_CREATE_BATCH = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products/create-product-batch';
+const https = require('https');
 
 export const GeneralInfoForm = () => {
   const [file, setFile] = useState()
@@ -70,6 +71,9 @@ export const GeneralInfoForm = () => {
               console.log("starting import of file", file, "with fields", fields);
             }}
             processChunk={async (rows) => {
+              const httpsAgent = new https.Agent({
+                rejectUnauthorized: false,
+              });
               // required, receives a list of parsed objects based on defined fields and user column mapping;
               // may be called several times if file is large
               // (if this callback returns a promise, the widget will wait for it before parsing more data)
@@ -97,6 +101,7 @@ export const GeneralInfoForm = () => {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(employees),
+                agent: httpsAgent,
               })
                 .then((data) => {
                   if(data.status == 400){

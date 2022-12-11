@@ -1,10 +1,17 @@
 import axios from "axios";
 
 const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
+const https = require('https');
 
+const instance = axios.create({
+  httpsAgent: new https.Agent({  
+    rejectUnauthorized: false
+  })
+});
 class AuthService {
+  
   login(username, password) {
-    return axios
+    return instance
       .post(API_URL + "signin", { username, password })
       .then((response) => {
         console.log('Data retrieved from login service ', JSON.stringify(response.data));
@@ -27,7 +34,7 @@ class AuthService {
   }
 
   register(username, email, password) {
-    return axios.post(API_URL + "signup", {
+    return instance.post(API_URL + "signup", {
       username,
       email,
       password,
