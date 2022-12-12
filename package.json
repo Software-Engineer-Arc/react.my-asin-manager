@@ -15,9 +15,7 @@
   ],
   "license": "MIT",
   "homepage": "/",
-  "bugs": {
-    "url": "https://github.com/themesberg/volt-react-dashboard/issues"
-  },
+  "proxy": "http://ec2-3-231-59-47.compute-1.amazonaws.com:8080",
   "repository": {
     "type": "git",
     "url": "https://github.com/themesberg/volt-react-dashboard"
