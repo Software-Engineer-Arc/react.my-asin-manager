@@ -16,9 +16,10 @@ import Alert from '@mui/material/Alert';
 import { useSelector, useDispatch } from 'react-redux';
 
 import App from './App'
+import { properties } from '../properties.js';
 
 
-const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sp-api/process-product';
+const URL_PRODUCTS = `${properties.HOST}/sp-api/process-product`;
 const https = require('https');
 export default () => {
   const [inputValue, setInputValue] = useState('');

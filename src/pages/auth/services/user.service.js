@@ -1,7 +1,8 @@
 import axios from "axios";
 import authHeader from "./auth-header";
+import { properties } from '../properties.js';
 
-const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/test/";
+const API_URL = `${properties.HOST}/api/test/`;
 
 class UserService {
   getPublicContent() {

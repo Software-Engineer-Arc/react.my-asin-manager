@@ -22,6 +22,8 @@ import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { properties } from '../../../properties.js';
+
 let easing = [0.6, -0.05, 0.01, 0.99];
 const animate = {
   opacity: 1,
@@ -33,7 +35,7 @@ const animate = {
   },
 };
 
-const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
+const API_URL = `${properties.HOST}/api/auth/`;
 const LoginForm = ({ setAuth }) => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";

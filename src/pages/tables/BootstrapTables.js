@@ -30,11 +30,12 @@ import {
   employeeValues,
   employeeTaskValues,
 } from '../generator';
+import { properties } from '../../properties.js';
 
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
-const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
+const URL_PRODUCTS = `${properties.HOST}/products`;
 
 const https = require('https');
 

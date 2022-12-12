@@ -54,12 +54,13 @@ import {
 } from './generator';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
+import { properties } from '../properties.js';
 
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
-const URL_PRODUCTS = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products';
-const URL_CATEGORIES = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/tags';
-const URL_PRODUCTS_UPDATED = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/sse/product-prices';
+const URL_PRODUCTS = `${properties.HOST}/products`;
+const URL_CATEGORIES = `${properties.HOST}tags`;
+const URL_PRODUCTS_UPDATED = `${properties.HOST}/sse/product-prices`;
 const https = require('https');
 const CurrencyFormatter = ({ value }) => (
     <b style={{ color: 'darkgreen' }}>

@@ -18,10 +18,11 @@ import { Importer, ImporterField } from "react-csv-importer";
 import "react-csv-importer/dist/index.css";
 import { Architecture } from "@mui/icons-material";
 import { useSelector, useDispatch } from 'react-redux';
+import { properties } from '../properties.js';
 
 
-const URL_UPLOAD_CSV_FILE = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/multipart-file/upload-filePart';
-const URL_CREATE_BATCH = 'https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/products/create-product-batch';
+const URL_UPLOAD_CSV_FILE = `${properties.HOST}/multipart-file/upload-filePart`;
+const URL_CREATE_BATCH = `${properties.HOST}/products/create-product-batch`;
 const https = require('https');
 
 export const GeneralInfoForm = () => {

@@ -16,6 +16,8 @@ import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { properties } from '../../../properties.js';
+
 /////////////////////////////////////////////////////////////
 let easing = [0.6, -0.05, 0.01, 0.99];
 const animate = {
@@ -27,7 +29,7 @@ const animate = {
     delay: 0.16,
   },
 };
-const API_URL = "https://ec2-34-212-141-95.us-west-2.compute.amazonaws.com:8080/api/auth/";
+const API_URL = `${properties.HOST}/api/auth/`;
 
 const SignupForm = ({ setAuth }) => {
   const navigate = useNavigate();
@@ -64,11 +66,12 @@ const SignupForm = ({ setAuth }) => {
       let username = e.email;
       let email = e.email;
       let password = e.password;
-
+      let fullName = e.firstName + " " + e.lastName;
       axios.post(API_URL + "signup", {
         username,
         email,
         password,
+        fullName,
       }).then((response) => {
         toast.success("Signup successful!", {
           position: toast.POSITION.BOTTOM_CENTER
