@@ -1,3 +1,3 @@
 export const properties = {
-    HOST: "http://localhost:8080"
+    HOST: "https://ec2-3-231-59-47.compute-1.amazonaws.com:8080"
 };
