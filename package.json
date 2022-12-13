@@ -98,8 +98,8 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "start": "set HTTPS=true&&set SSL_CRT_FILE=./.cert/cert.pem&&set SSL_KEY_FILE=./cert/key.pem&&react-scripts start",
+    "deploy": "aws s3 sync build/ s3://www.myasinmanager.com",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "build-local": "PUBLIC_URL=./ react-scripts build",
     "test": "react-scripts test",
