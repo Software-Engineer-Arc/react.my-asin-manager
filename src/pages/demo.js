@@ -59,7 +59,7 @@ import { properties } from '../properties.js';
 const URL = 'https://js.devexpress.com/Demos/WidgetsGalleryDataService/api/orders?requireTotalCount=true';
 
 const URL_PRODUCTS = `${properties.HOST}/products`;
-const URL_CATEGORIES = `${properties.HOST}tags`;
+const URL_CATEGORIES = `${properties.HOST}/tags`;
 const URL_PRODUCTS_UPDATED = `${properties.HOST}/sse/product-prices`;
 const https = require('https');
 const CurrencyFormatter = ({ value }) => (
@@ -102,8 +102,8 @@ const ImageFormatter = ({ value }) => (
 const DateFormatter = ({ value }) => {
     let date = new Date(value);
     return (
-        <b style={{ color: 'darkgreen' }}>
-            {4}
+        <b style={{ color: 'gray' }}>
+            {new Date(value).toLocaleDateString()}
         </b>
     );
 };
@@ -186,13 +186,13 @@ const useStyles = makeStyles({
 
 const detailColumns = [
     { name: 'notes', title: 'Notes' },
-    { name: 'date', title: 'Date' },
+    // { name: 'date', title: 'Date' },
     { name: 'tags', title: 'Tags' },
     // { name: 'alternateSupplier', title: 'Alternate Supplier' },
 ];
 const tableDetailColumnExtensions = [
     { columnName: 'notes', width: 165 },
-    { columnName: 'date', width: 115 },
+    // { columnName: 'date', width: 115 },
     { columnName: 'tags', width: 115 },
 ];
 
@@ -283,6 +283,8 @@ export default () => {
         { name: 'roi', title: 'ROI' },
         { name: 'currentBSR', title: 'BSR' },
         { name: 'fbaSellerCount', title: 'FBA Seller count' },
+        { name: 'date', title: 'Date' },
+
 
     ]);
     const [rows, setRows] = useState([]);
@@ -291,7 +293,7 @@ export default () => {
     const [imageColumns] = useState(['image']);
     const [linkColumns] = useState(['supplierLink']);
     const [urlColumns] = useState(['asin']);
-    const [dateColumns] = useState(['details.date']);
+    const [dateColumns] = useState(['date']);
 
 
     const [tableColumnExtensions] = useState([
@@ -317,8 +319,9 @@ export default () => {
         { columnName: 'roi', width: 100 },
         { columnName: 'currentBSR', width: 100 },
         { columnName: 'fbaSellerCount', width: 150 },
+        { columnName: 'date', width: 100 },
     ]);
-    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']);
+    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']);
 
     const [filteringStateColumnExtensions] = useState([
         { columnName: 'image', filteringEnabled: false },
@@ -407,6 +410,7 @@ export default () => {
         const user = JSON.parse(localStorage.getItem("user"));
         let authHeader = { Authorization: "Bearer " + user.accessToken };
         let URL_CATEGORIES_BY_USER = `${URL_CATEGORIES}?username=${user.username}`;
+        console.log('Tags url ', URL_CATEGORIES_BY_USER);
         fetch(URL_CATEGORIES_BY_USER, { headers: authHeader, agent: httpsAgent })
             .then(response => response.json())
             .then((data) => {
@@ -421,7 +425,7 @@ export default () => {
     const commitChanges = ({ added, changed, deleted }) => {
         const httpsAgent = new https.Agent({
             rejectUnauthorized: false,
-          });
+        });
         let changedRows;
         if (added) {
             const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
@@ -558,7 +562,7 @@ export default () => {
         const handleSave = () => {
             const httpsAgent = new https.Agent({
                 rejectUnauthorized: false,
-              });
+            });
             console.log('Selected tags ', selectedTag);
             console.log('Product id ', productId);
             setLoading(true);
@@ -688,7 +692,7 @@ export default () => {
         const handleAddNewNotes = (productId) => {
             const httpsAgent = new https.Agent({
                 rejectUnauthorized: false,
-              });
+            });
             setLoading(true);
             let URL_ADD_NOTES = `${URL_PRODUCTS}/${productId}/add-notes?notes=${valueText}`;
             console.log('Url ', URL_ADD_NOTES);
@@ -759,12 +763,12 @@ export default () => {
                             <br />
                         </Paper>
                         <br />
-                        <Typography className={useStyles.title} color="textSecondary" gutterBottom>
+                        {/* <Typography className={useStyles.title} color="textSecondary" gutterBottom>
                             Date
                         </Typography>
                         <Typography variant="body2" component="p">
                             {new Date(row.details.date).toLocaleDateString()}
-                        </Typography>
+                        </Typography> */}
                         <Typography className={useStyles.title} color="textSecondary" gutterBottom>
                             Notes
                         </Typography>
@@ -833,7 +837,7 @@ export default () => {
                 rows={rows}
                 columns={columns}
             >
-                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']}
+                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']}
                     columnExtensions={filteringStateColumnExtensions}
                 />
                 <IntegratedFiltering />
@@ -878,7 +882,6 @@ export default () => {
                     onCommitChanges={commitChanges}
                     columnEditingEnabled={false}
                     columnExtensions={[{ columnName: "netProfit", editingEnabled: false }, { columnName: "asin", editingEnabled: false }, { columnName: "supplier", editingEnabled: true }, { columnName: "supplierLink", editingEnabled: true }, { columnName: "buyCost", editingEnabled: true }]}
-
                 />
 
 
@@ -915,7 +918,7 @@ export default () => {
                     onColumnWidthsChange={setColumnWidths}
                 />
                 <TableColumnReordering
-                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount']}
+                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']}
                 />
                 <TableHeaderRow showSortingControls />
                 <TableEditRow />
