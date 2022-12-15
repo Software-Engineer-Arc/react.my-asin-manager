@@ -486,7 +486,7 @@ export default () => {
                 <Image src={ReactHero} />
                 <span className="ms-2 brand-text">Volt React</span>
               </Navbar.Brand>
-              <p>Volt React is a free and open source admin dashboard template powered by React.js and Bootstrap 5.</p>
+              <p>MYASINManager is an application software that allows a seller to manage their products based on their ASIN identifier is a useful tool for e-commerce businesses. The ASIN (Amazon Standard Identification Number) is a unique identifier assigned to each product on Amazon, and this application would allow the seller to easily track and manage their inventory based on the ASINs assigned to each product. This could include features such as adding and editing product information, tracking product sales and performance, and generating reports on product data. This type of software could help sellers to efficiently manage their products and improve their performance on Amazon.</p>
             </Col>
             <Col xs={6} md={2} className="mb-5 mb-lg-0">
               <span className="h5">Themesberg</span>

@@ -20,8 +20,8 @@
 		"Framework": "react"
 	},
 	"packageJson": {
-		"name": "@themesberg/volt-react-dashboard",
-		"description": "Volt React Dashboard is a free and open source admin dashboard template powered by React.js and Bootstrap 5",
+		"name": "MYASINManager",
+		"description": "MYASINManager is an application software that allows a seller to manage their products based on their ASIN identifier is a useful tool for e-commerce businesses. The ASIN (Amazon Standard Identification Number) is a unique identifier assigned to each product on Amazon, and this application would allow the seller to easily track and manage their inventory based on the ASINs assigned to each product. This could include features such as adding and editing product information, tracking product sales and performance, and generating reports on product data. This type of software could help sellers to efficiently manage their products and improve their performance on Amazon.",
 		"author": "Themesberg",
 		"keywords": [
 			"bootstrap 5",
