@@ -78,44 +78,49 @@ export const GeneralInfoForm = () => {
               // required, receives a list of parsed objects based on defined fields and user column mapping;
               // may be called several times if file is large
               // (if this callback returns a promise, the widget will wait for it before parsing more data)
-              console.log("received batch of rows", rows);
+              console.log("Received batch of rows==================", rows);
               const user = JSON.parse(localStorage.getItem("user"));
-              console.log('For username ',user );
+              console.log('For username ================ ',user );
 
               var employees = [];
-              rows.forEach(row => {
+              for (var i = 0; i < rows.length; i++) {
+                if((rows[i].asin == undefined || rows[i].asin == '')|| (rows[i].supplierLink == undefined || rows[i].supplierLink == '')|| (rows[i].supplier == undefined || rows[i].supplier == '')|| (rows[i].buyCost == undefined || rows[i].buyCost == '') ){
+                  continue;
+                }
+                console.log('row  completed ================ ',rows[i]);
                 var employee = {
-                  "asin": row.asin,
-                  "supplierLink": row.supplierLink,
-                  "supplier": row.supplier,
-                  "buyCost": row.buyCost,
+                  asin: rows[i].asin,
+                  supplier: rows[i].supplier,
+                  supplierLink: rows[i].supplierLink,
+                  buyCost: rows[i].buyCost.replace('$', ''),
                 };
                 employees.push(employee);
-              });
-              console.log(employees);
+              }
+
               let URL_ADD_CREATION_BATCH_USERNAMR = `${URL_CREATE_BATCH}?username=${user.username}`;
               console.log('URL FOR BATCH ', URL_ADD_CREATION_BATCH_USERNAMR);
+              let body =  JSON.stringify(employees);
+              console.log('BODY FOR BATCH ', body);
 
               fetch(URL_ADD_CREATION_BATCH_USERNAMR , {
                 method: 'POST', // or 'PUT'
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(employees),
+                body: body,
                 agent: httpsAgent,
               })
                 .then((data) => {
                   if(data.status == 400){
-                    console.log('Error adding notes')
-                    ;
+                    console.log('Error adding products by csv');
                   }else{
-                    console.log('Success adding notes');
+                    console.log('Success adding products by csv');
                   }
                   //newTagValue = '';
                 })
                 .catch((e) => {
                   // newTagValue = '';
-                  console.log('Error adding notes', e);
+                  console.log('Error adding products by csv', e);
                 });
               // mock timeout to simulate processing
               await new Promise((resolve) => setTimeout(resolve, 500));
