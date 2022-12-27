@@ -87,7 +87,6 @@ export const GeneralInfoForm = () => {
                 if((rows[i].asin == undefined || rows[i].asin == '')|| (rows[i].supplierLink == undefined || rows[i].supplierLink == '')|| (rows[i].supplier == undefined || rows[i].supplier == '')|| (rows[i].buyCost == undefined || rows[i].buyCost == '') ){
                   continue;
                 }
-                console.log('row  completed ================ ',rows[i]);
                 var employee = {
                   asin: rows[i].asin,
                   supplier: rows[i].supplier,
@@ -123,7 +122,7 @@ export const GeneralInfoForm = () => {
                   console.log('Error adding products by csv', e);
                 });
               // mock timeout to simulate processing
-              await new Promise((resolve) => setTimeout(resolve, 500));
+              await new Promise((resolve) => setTimeout(resolve, 7000));
             }}
             onComplete={({ file, fields }) => {
               // optional, invoked right after import is done (but user did not dismiss/reset the widget yet)
