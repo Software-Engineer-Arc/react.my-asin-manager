@@ -86,49 +86,8 @@ export default () => {
   }, []);
 
   return (
-    <Paper>
-
-      {/* <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-        <div className="d-block mb-4 mb-md-0" >
-          <h4>Products</h4>
-        </div>
-        <div className="btn-toolbar mb-2 mb-md-0">
-
-        </div>
-      </div>
-
-      <div className="table-settings mb-4" >
-
-        <Row className="justify-content-between align-items-center">
-          <Stack direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-
-            <Paper><InputGroup>
-              <InputGroup.Text>
-                <FontAwesomeIcon icon={faSearch} />
-              </InputGroup.Text>
-              <Form.Control onChange={handleChange} type="text" placeholder="ASIN" aria-describedby="inputGroup-sizing-sm" />
-            </InputGroup>
-            </Paper>
-
-            <Button variant="contained" endIcon={<SendIcon />} onClick={handleLoadProduct}>
-              Load product
-            </Button>
-          </Stack>
-
-        </Row>
-
-      </div>
-
-      {loading && <Stack alignItems="center">
-        <CircularProgress />
-      </Stack>}
-      <Stack sx={{ width: '100%' }} spacing={2}>
-        {productNotFound && <Alert onClose={() => { setProductNotFound(false); }} severity="warning">The product with the asin '{inputValue}' was not found</Alert>}
-        {productLoaded && <Alert onClose={() => {
-          setProductLoaded(false);
-        }} severity="success">The product was loaded sucessfully</Alert>}
-      </Stack> */}
+ 
       <App />
-    </Paper>
+
   );
 };

@@ -36,8 +36,9 @@ import {
     IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSorting, IntegratedSelection, CustomPaging, DataTypeProvider,
     EditingState
 } from '@devexpress/dx-react-grid';
+
 import {
-    Grid, Table, TableBandHeader, TableHeaderRow,
+    Grid, VirtualTable, Table, TableBandHeader, TableHeaderRow,
     TableFilterRow, TableSelection, TableGroupRow, TableRowDetail,
     GroupingPanel, PagingPanel, DragDropProvider, TableColumnReordering, TableColumnResizing, Toolbar, TableEditColumn, TableEditRow
 } from '@devexpress/dx-react-grid-material-ui';
@@ -168,6 +169,9 @@ const StyledDiv = styled('div')(({ theme }) => ({
 }));
 
 const useStyles = makeStyles({
+    paper: {
+        height: 1000,
+    },
     root: {
         minWidth: 275,
     },
@@ -296,10 +300,6 @@ export default () => {
     const [dateColumns] = useState(['date']);
 
 
-    const [tableColumnExtensions] = useState([
-        { columnName: 'title', align: 'left' },
-        { columnName: 'asin', align: 'left' },
-    ]);
     const [sorting, setSorting] = useState([{ columnName: 'title', direction: 'asc' }]);
     const [totalCount, setTotalCount] = useState(0);
     const [pageSize, setPageSize] = useState(50);
@@ -321,7 +321,21 @@ export default () => {
         { columnName: 'fbaSellerCount', width: 150 },
         { columnName: 'date', width: 100 },
     ]);
-    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']);
+    const [tableColumnExtensions] = useState([
+        { columnName: 'image', width: 100 },
+        { columnName: 'title', width: 350 },
+        { columnName: 'asin', width: 130 },
+        { columnName: 'supplier', width: 140 },
+        { columnName: 'supplierLink', width: 130 },
+        { columnName: 'currentBBPrice', width: 100 },
+        { columnName: 'buyCost', width: 100 },
+        { columnName: 'netProfit', width: 120 },
+        { columnName: 'roi', width: 100 },
+        { columnName: 'currentBSR', width: 100 },
+        { columnName: 'fbaSellerCount', width: 150 },
+        { columnName: 'date', width: 100 },
+    ]);
+    const [columnOrder, setColumnOrder] = useState(['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount', 'date']);
 
     const [filteringStateColumnExtensions] = useState([
         { columnName: 'image', filteringEnabled: false },
@@ -797,7 +811,7 @@ export default () => {
         return false;
     }
     return (
-        <Paper  >
+        <Paper className={useStyles.paper} >
             <Card className={useStyles.root}>
                 <CardContent>
                     <Typography style={{ marginLeft: 15 }} className={useStyles.title} color="textSecondary" gutterBottom>
@@ -837,7 +851,11 @@ export default () => {
                 rows={rows}
                 columns={columns}
             >
-                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']}
+                <VirtualTable
+                    height={800}
+                    columnExtensions={tableColumnExtensions}
+                />
+                <FilteringState defaultFilters={['title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount', 'date']}
                     columnExtensions={filteringStateColumnExtensions}
                 />
                 <IntegratedFiltering />
@@ -904,9 +922,6 @@ export default () => {
                 <RowDetailState
 
                 />
-                <Table
-                    columnExtensions={tableColumnExtensions}
-                />
                 <TableFilterRow />
 
                 <TableGroupRow />
@@ -918,7 +933,7 @@ export default () => {
                     onColumnWidthsChange={setColumnWidths}
                 />
                 <TableColumnReordering
-                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount','date']}
+                    defaultOrder={['image', 'title', 'asin', 'supplier', 'supplierLink', 'currentBBPrice', 'buyCost', 'netProfit', 'roi', 'currentBSR', 'fbaSellerCount', 'date']}
                 />
                 <TableHeaderRow showSortingControls />
                 <TableEditRow />
